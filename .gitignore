@@ -1,5 +1,7 @@
 /target
+/test*
 .DS_Store
 near-cli
 *.wasm
 *.json
+*.bak

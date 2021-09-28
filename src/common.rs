@@ -12,6 +12,45 @@ use near_primitives::{
 
 pub type CliResult = color_eyre::eyre::Result<()>;
 
+use dialoguer::{theme::ColorfulTheme, Select};
+use strum::{EnumMessage, IntoEnumIterator};
+pub fn prompt_variant<T>(prompt: &str) -> T
+where
+    T: IntoEnumIterator + EnumMessage,
+    T: Copy + Clone,
+{
+    let variants = T::iter().collect::<Vec<_>>();
+    let actions = variants
+        .iter()
+        .map(|p| {
+            p.get_message()
+                .unwrap_or_else(|| "error[This entry does not have an option message!!]")
+                .to_owned()
+        })
+        .collect::<Vec<_>>();
+
+    let selected = Select::with_theme(&ColorfulTheme::default())
+        .with_prompt(prompt)
+        .items(&actions)
+        .default(0)
+        .interact()
+        .unwrap();
+
+    variants[selected]
+}
+
+// #[derive(Debug, Default, Clone)]
+// pub struct Context {
+//     pub connection_config: Option<ConnectionConfig>,
+//     pub sender_account_id: Option<near_primitives::types::AccountId>,
+// }
+
+#[derive(Clone)]
+pub struct SenderContext {
+    pub connection_config: Option<ConnectionConfig>,
+    pub sender_account_id: crate::types::account_id::AccountId,
+}
+
 #[derive(
     Debug,
     Clone,
@@ -89,6 +128,10 @@ pub struct AvailableRpcServerUrl {
     pub inner: url::Url,
 }
 
+impl interactive_clap::ToCli for AvailableRpcServerUrl {
+    type CliVariant = AvailableRpcServerUrl;
+}
+
 impl std::str::FromStr for AvailableRpcServerUrl {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -116,6 +159,10 @@ const ONE_NEAR: u128 = 10u128.pow(24);
 #[derive(Debug, Clone, Default, PartialEq, PartialOrd)]
 pub struct NearBalance {
     pub yoctonear_amount: u128,
+}
+
+impl interactive_clap::ToCli for NearBalance {
+    type CliVariant = NearBalance;
 }
 
 impl NearBalance {
@@ -201,6 +248,10 @@ pub struct NearGas {
     pub inner: u64,
 }
 
+impl interactive_clap::ToCli for NearGas {
+    type CliVariant = NearGas;
+}
+
 impl std::fmt::Display for NearGas {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.inner == 0 {
@@ -282,6 +333,10 @@ pub struct TransferAmount {
     amount: NearBalance,
 }
 
+impl interactive_clap::ToCli for TransferAmount {
+    type CliVariant = NearBalance;
+}
+
 impl std::fmt::Display for TransferAmount {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.amount)
@@ -326,6 +381,12 @@ pub enum ConnectionConfig {
 }
 
 impl ConnectionConfig {
+    pub fn from_custom_url(custom_url: &AvailableRpcServerUrl) -> Self {
+        Self::Custom {
+            url: custom_url.inner.clone(),
+        }
+    }
+
     pub fn rpc_url(&self) -> url::Url {
         match self {
             Self::Testnet => crate::consts::TESTNET_API_SERVER_URL.parse().unwrap(),
