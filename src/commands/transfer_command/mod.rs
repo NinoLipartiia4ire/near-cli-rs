@@ -44,7 +44,7 @@ impl Currency {
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 #[interactive_clap(context = crate::common::Context)]
 ///What do you want to transfer?
-enum CurrencySelection {
+pub enum CurrencySelection {
     /// The transfer is carried out in NEAR tokens
     #[strum_discriminants(strum(message = "NEAR tokens"))]
     Near(self::operation_mode::OperationMode),

@@ -3,8 +3,8 @@ use interactive_clap_derive::{InteractiveClap, ToCliArgs};
 
 #[derive(Debug, Clone, InteractiveClap)]
 pub struct OfflineArgs {
-    #[interactive_clap(subcommand)]
-    send_from: super::online_mode::select_server::server::SendFrom,
+    #[interactive_clap(named_arg)]
+    send_from: super::super::sender::Sender,
 }
 
 impl OfflineArgs {
@@ -12,12 +12,20 @@ impl OfflineArgs {
         item: CliOfflineArgs,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<Self> {
-        let send_from = match item.send_from {
-            Some(cli_send_from) => {
-                super::online_mode::select_server::server::SendFrom::from(cli_send_from, context)?
-            }
-            None => super::online_mode::select_server::server::SendFrom::choose_variant(context)?,
-        };
+        let optional_clap_variant = Some(item);
+        // let send_from = match item.send_from {
+        //     Some(cli_send_from) => {
+        //         super::online_mode::select_server::server::SendFrom::from(cli_send_from, context)?
+        //     }
+        //     None => super::online_mode::select_server::server::SendFrom::choose_variant(context)?,
+        // };
+        let send_from = super::super::sender::Sender::from(
+            optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
+                Some(ClapNamedArgSender::Sender(cli_sender)) => Some(cli_sender),
+                None => None,
+            }),
+            context,
+        )?;
         Ok(Self { send_from })
     }
 }

@@ -7,8 +7,9 @@ use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 pub struct Server {
     #[interactive_clap(skip)]
     pub connection_config: Option<crate::common::ConnectionConfig>,
-    #[interactive_clap(subcommand)]
-    pub send_from: SendFrom,
+    #[interactive_clap(named_arg)]
+    ///Specify a sender
+    pub send_from: super::super::super::super::sender::Sender,
 }
 
 impl ToCli for crate::common::ConnectionConfig {
@@ -19,8 +20,8 @@ impl ToCli for crate::common::ConnectionConfig {
 pub struct CustomServer {
     #[interactive_clap(long)]
     pub url: crate::common::AvailableRpcServerUrl,
-    #[interactive_clap(subcommand)]
-    pub send_from: SendFrom,
+    #[interactive_clap(named_arg, duplicate)]
+    pub send_from: super::super::super::super::sender::Sender,
 }
 
 impl ToCli for crate::common::AvailableRpcServerUrl {
@@ -33,14 +34,22 @@ impl CliServer {
         connection_config: crate::common::ConnectionConfig,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<Server> {
+        let optional_clap_variant = Some(self);
         let context = crate::common::Context {
             connection_config: Some(connection_config.clone()),
             ..context
         };
-        let send_from = match self.send_from {
-            Some(cli_send_from) => SendFrom::from(cli_send_from, context)?,
-            None => SendFrom::choose_variant(context)?,
-        };
+        // let send_from = match self.send_from {
+        //     Some(cli_send_from) => SendFrom::from(cli_send_from, context)?,
+        //     None => SendFrom::choose_variant(context)?,
+        // };
+        let send_from = super::super::super::super::sender::Sender::from(
+            optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
+                Some(ClapNamedArgSender::Sender(cli_sender)) => Some(cli_sender),
+                None => None,
+            }),
+            context,
+        )?;
         Ok(Server {
             connection_config: Some(connection_config),
             send_from,
@@ -53,6 +62,7 @@ impl CliCustomServer {
         self,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<CustomServer> {
+        let optional_clap_variant = Some(self.clone());
         let url: crate::common::AvailableRpcServerUrl = match self.url {
             Some(url) => url,
             None => Input::new()
@@ -65,10 +75,17 @@ impl CliCustomServer {
             connection_config: connection_config.clone(),
             ..context
         };
-        let send_from = match self.send_from {
-            Some(cli_send_from) => SendFrom::from(cli_send_from, context)?,
-            None => SendFrom::choose_variant(context)?,
-        };
+        // let send_from = match self.send_from {
+        //     Some(cli_send_from) => SendFrom::from(cli_send_from, context)?,
+        //     None => SendFrom::choose_variant(context)?,
+        // };
+        let send_from = super::super::super::super::sender::Sender::from(
+            optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
+                Some(ClapNamedArgSender::Sender(cli_sender)) => Some(cli_sender),
+                None => None,
+            }),
+            context,
+        )?;
         Ok(CustomServer { url, send_from })
     }
 }
@@ -93,29 +110,5 @@ impl CustomServer {
         self.send_from
             .process(prepopulated_unsigned_transaction, connection_config)
             .await
-    }
-}
-
-#[derive(Debug, Clone, InteractiveClap)]
-#[interactive_clap(disable_strum_discriminants)]
-#[interactive_clap(context = crate::common::Context)]
-pub enum SendFrom {
-    /// Specify a sender
-    Sender(crate::commands::transfer_command::sender::Sender),
-}
-
-impl SendFrom {
-    pub async fn process(
-        self,
-        prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,
-        connection_config: Option<crate::common::ConnectionConfig>,
-    ) -> crate::CliResult {
-        match self {
-            SendFrom::Sender(sender) => {
-                sender
-                    .process(prepopulated_unsigned_transaction, connection_config)
-                    .await
-            }
-        }
     }
 }

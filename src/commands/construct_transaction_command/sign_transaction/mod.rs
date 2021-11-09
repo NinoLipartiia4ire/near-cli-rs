@@ -34,7 +34,6 @@ pub enum SignTransaction {
     // SignManually(self::sign_manually::SignManually),
 }
 
-
 impl SignTransaction {
     pub async fn process(
         self,
