@@ -1,6 +1,6 @@
 use dialoguer::{theme::ColorfulTheme, Select};
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
 pub mod server;

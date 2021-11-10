@@ -1,6 +1,6 @@
 extern crate dirs;
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 
 use serde::Deserialize;
 

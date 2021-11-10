@@ -1,7 +1,7 @@
 use clap::Clap;
 extern crate shell_words;
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 mod commands;
 mod common;
 mod consts;

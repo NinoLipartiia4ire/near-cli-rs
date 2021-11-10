@@ -1,6 +1,6 @@
 use dialoguer::Input;
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
 #[derive(Debug, Clone, InteractiveClap)]
@@ -20,7 +20,7 @@ impl ToCli for crate::common::ConnectionConfig {
 pub struct CustomServer {
     #[interactive_clap(long)]
     pub url: crate::common::AvailableRpcServerUrl,
-    #[interactive_clap(named_arg, duplicate)]
+    #[interactive_clap(named_arg)]
     pub send_from: super::super::super::super::sender::Sender,
 }
 
@@ -45,7 +45,7 @@ impl CliServer {
         // };
         let send_from = super::super::super::super::sender::Sender::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
-                Some(ClapNamedArgSender::Sender(cli_sender)) => Some(cli_sender),
+                Some(ClapNamedArgSenderForServer::SendFrom(cli_sender)) => Some(cli_sender),
                 None => None,
             }),
             context,
@@ -81,7 +81,7 @@ impl CliCustomServer {
         // };
         let send_from = super::super::super::super::sender::Sender::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
-                Some(ClapNamedArgSender::Sender(cli_sender)) => Some(cli_sender),
+                Some(ClapNamedArgSenderForCustomServer::SendFrom(cli_sender)) => Some(cli_sender),
                 None => None,
             }),
             context,

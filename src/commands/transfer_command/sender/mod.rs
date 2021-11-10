@@ -1,6 +1,6 @@
 use dialoguer::Input;
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]
 pub struct Sender {
@@ -64,7 +64,7 @@ impl Sender {
         // };
         let send_to = super::receiver::Receiver::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_to {
-                Some(ClapNamedArgReceiver::Receiver(cli_receiver)) => Some(cli_receiver),
+                Some(ClapNamedArgReceiverForSender::SendTo(cli_receiver)) => Some(cli_receiver),
                 None => None,
             }),
             context,

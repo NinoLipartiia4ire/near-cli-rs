@@ -1,5 +1,5 @@
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 use near_primitives::borsh::BorshSerialize;
 
 #[derive(Debug, Clone, InteractiveClap)]

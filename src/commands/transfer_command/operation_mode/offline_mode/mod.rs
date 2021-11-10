@@ -1,5 +1,5 @@
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]
 pub struct OfflineArgs {
@@ -21,7 +21,7 @@ impl OfflineArgs {
         // };
         let send_from = super::super::sender::Sender::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
-                Some(ClapNamedArgSender::Sender(cli_sender)) => Some(cli_sender),
+                Some(ClapNamedArgSenderForOfflineArgs::SendFrom(cli_sender)) => Some(cli_sender),
                 None => None,
             }),
             context,

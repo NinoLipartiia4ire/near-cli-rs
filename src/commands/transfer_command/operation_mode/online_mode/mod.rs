@@ -1,6 +1,6 @@
 pub mod select_server;
 use interactive_clap::ToCli;
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
+use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]
 pub struct NetworkArgs {
