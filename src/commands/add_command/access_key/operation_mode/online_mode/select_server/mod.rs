@@ -25,8 +25,19 @@ pub enum SelectServer {
     #[strum_discriminants(strum(message = "Betanet"))]
     Betanet(self::server::Server),
     #[strum_discriminants(strum(message = "Custom"))]
-    Custom(self::server::Server),
+    Custom(self::server::CustomServer),
 }
+
+// pub enum SelectServerScope {
+//     #[strum_discriminants(strum(message = "Testnet"))]
+//     Testnet(),
+//     #[strum_discriminants(strum(message = "Mainnet"))]
+//     Mainnet(),
+//     #[strum_discriminants(strum(message = "Betanet"))]
+//     Betanet(),
+//     #[strum_discriminants(strum(message = "Custom"))]
+//     Custom(),
+// }
 
 impl CliSelectServer {
     pub fn to_cli_args(&self) -> std::collections::VecDeque<String> {
@@ -66,27 +77,118 @@ impl From<SelectServer> for CliSelectServer {
     }
 }
 
-impl SelectServer {
-    pub fn from(item: CliSelectServer) -> color_eyre::eyre::Result<Self> {
-        match item {
-            CliSelectServer::Testnet(cli_server) => Ok(Self::Testnet(
-                cli_server.into_server(crate::common::ConnectionConfig::Testnet)?,
-            )),
-            CliSelectServer::Mainnet(cli_server) => Ok(Self::Mainnet(
-                cli_server.into_server(crate::common::ConnectionConfig::Mainnet)?,
-            )),
-            CliSelectServer::Betanet(cli_server) => Ok(Self::Betanet(
-                cli_server.into_server(crate::common::ConnectionConfig::Betanet)?,
-            )),
-            CliSelectServer::Custom(cli_custom_server) => {
-                Ok(Self::Custom(cli_custom_server.into_server()?))
-            }
+pub struct InteractiveClapContextScopeForSelectServer {
+    connection_config: Option<crate::common::ConnectionConfig>,
+}
+
+impl crate::common::ToInteractiveClapContextScope for SelectServer {
+    type InteractiveClapContextScope = InteractiveClapContextScopeForSelectServer;
+}
+
+struct SelectServerContext {
+    connection_config: crate::common::ConnectionConfig,
+}
+
+impl SelectServerContext {
+    fn from_previous_context(
+        previous_context: (),
+        scope: <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+    ) -> Self {
+        Self {
+            connection_config: scope.connection_config.unwrap(),
         }
     }
 }
 
+impl From<SelectServerContext> for super::super::NetworkContext {
+    fn from(item: SelectServerContext) -> Self {
+        Self {
+            connection_config: Some(item.connection_config),
+        }
+    }
+}
+
+// impl SelectServer {
+//     pub fn from(
+//         item: CliSelectServer,
+//         context: crate::common::Context,
+//     ) -> color_eyre::eyre::Result<Self> {
+//         match item {
+//             CliSelectServer::Testnet(cli_server) => Ok(Self::Testnet(
+//                 cli_server.into_server(crate::common::ConnectionConfig::Testnet, context)?,
+//             )),
+//             CliSelectServer::Mainnet(cli_server) => Ok(Self::Mainnet(
+//                 cli_server.into_server(crate::common::ConnectionConfig::Mainnet, context)?,
+//             )),
+//             CliSelectServer::Betanet(cli_server) => Ok(Self::Betanet(
+//                 cli_server.into_server(crate::common::ConnectionConfig::Betanet, context)?,
+//             )),
+//             CliSelectServer::Custom(cli_custom_server) => {
+//                 Ok(Self::Custom(cli_custom_server.into_server(context)?))
+//             }
+//         }
+//     }
+// }
+
 impl SelectServer {
-    pub fn choose_server() -> color_eyre::eyre::Result<Self> {
+    pub fn from(
+        optional_clap_variant: Option<CliSelectServer>,
+        context: (),
+    ) -> color_eyre::eyre::Result<Self> {
+        match optional_clap_variant.and_then(|clap_variant| match clap_variant {
+            CliSelectServer::Testnet(cli_server) => {
+                type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
+                let new_context_scope = Alias {
+                    connection_config: Some(crate::common::ConnectionConfig::Testnet),
+                };
+                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
+                Some(Self::Testnet(
+                    self::server::Server::from(Some(cli_server), &new_context).ok()?,
+                ))
+            }
+            CliSelectServer::Mainnet(cli_server) => {
+                type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
+                let new_context_scope = Alias {
+                    connection_config: Some(crate::common::ConnectionConfig::Mainnet),
+                };
+                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();                
+                Some(Self::Mainnet(
+                    self::server::Server::from(Some(cli_server), &new_context).ok()?,
+                ))
+            }
+            CliSelectServer::Betanet(cli_server) => {
+                type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
+                let new_context_scope = Alias {
+                    connection_config: Some(crate::common::ConnectionConfig::Betanet),
+                };
+                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
+                Some(Self::Betanet(
+                    self::server::Server::from(Some(cli_server), &new_context).ok()?,
+                ))
+            }
+            CliSelectServer::Custom(cli_custom_server) => {
+                let custom_url = self::server::CustomServer::input_url();
+                let new_context_scope = InteractiveClapContextScopeForSelectServer {// <Self as
+                    connection_config: Some(crate::common::ConnectionConfig::from_custom_url(&custom_url))
+                };
+                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
+                Some(Self::Custom(
+                    self::server::CustomServer::from(Some(cli_custom_server), &new_context).ok()?,
+                ))
+            }
+        }) {
+            Some(x) => {
+                println!("++++++++++++ select server: {:?}", &x);
+                Ok(x)
+            }
+            None => {
+                println!("------------ select server: ");
+                SelectServer::choose_server(context)
+            }
+        }
+    }
+
+    pub fn choose_server(context: ()) -> color_eyre::eyre::Result<Self> {
         println!();
         let variants = SelectServerDiscriminants::iter().collect::<Vec<_>>();
         let servers = variants
@@ -105,7 +207,21 @@ impl SelectServer {
             SelectServerDiscriminants::Betanet => CliSelectServer::Betanet(Default::default()),
             SelectServerDiscriminants::Custom => CliSelectServer::Custom(Default::default()),
         };
-        Ok(Self::from(cli_select_server)?)
+        // let connection_config = match variants[selected_server] {
+        //     SelectServerDiscriminants::Testnet => crate::common::ConnectionConfig::Testnet,
+        //     SelectServerDiscriminants::Mainnet => crate::common::ConnectionConfig::Mainnet,
+        //     SelectServerDiscriminants::Betanet => crate::common::ConnectionConfig::Betanet,
+        //     SelectServerDiscriminants::Custom => {
+        //         let custom_url = self::server::CustomServer::input_url();
+        //         crate::common::ConnectionConfig::from_custom_url(&custom_url)
+        //     },
+        // };
+        // let new_context_scope = Self::InteractiveClapContextScope {
+        //     connection_config,
+        // };
+        // let new_context = SelectServerContext::from(context, &new_context_scope);
+        println!("**************** select server: {:?}", &cli_select_server);
+        Ok(Self::from(Some(cli_select_server), context)?)
     }
 
     pub async fn process(

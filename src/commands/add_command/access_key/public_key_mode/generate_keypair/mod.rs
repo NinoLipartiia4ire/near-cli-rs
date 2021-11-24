@@ -14,6 +14,7 @@ pub struct CliGenerateKeypair {
 }
 
 #[derive(Debug, Clone)]
+// #[interactive_clap(context = super::super::sender::SenderContext)]
 pub struct GenerateKeypair {
     pub permission: super::add_access_key::AccessKeyPermission,
 }
@@ -39,21 +40,25 @@ impl From<GenerateKeypair> for CliGenerateKeypair {
 
 impl GenerateKeypair {
     pub fn from(
-        item: CliGenerateKeypair,
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        optional_clap_variant: Option<CliGenerateKeypair>,
+        context: &super::super::sender::SenderContext,
+        // connection_config: Option<crate::common::ConnectionConfig>,
+        // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
-        let permission: super::add_access_key::AccessKeyPermission = match item.permission {
-            Some(cli_permission) => super::add_access_key::AccessKeyPermission::from(
-                cli_permission,
-                connection_config,
-                sender_account_id,
-            )?,
-            None => super::add_access_key::AccessKeyPermission::choose_permission(
-                connection_config,
-                sender_account_id,
-            )?,
-        };
+        let permission: super::add_access_key::AccessKeyPermission =
+            match optional_clap_variant.and_then(|clap_variant| clap_variant.permission) {
+                Some(cli_permission) => super::add_access_key::AccessKeyPermission::from(
+                    cli_permission,
+                    context,
+                    // connection_config,
+                    // sender_account_id,
+                )?,
+                None => super::add_access_key::AccessKeyPermission::choose_permission(
+                    context,
+                    // connection_config,
+                    // sender_account_id,
+                )?,
+            };
         Ok(Self { permission })
     }
 }

@@ -19,6 +19,7 @@ pub struct CliAddAccessKeyAction {
 }
 
 #[derive(Debug, Clone)]
+// #[interactive_clap(context = super::super::sender::SenderContext)]
 pub struct AddAccessKeyAction {
     pub public_key: near_crypto::PublicKey,
     pub nonce: near_primitives::types::Nonce,
@@ -52,18 +53,17 @@ impl From<AddAccessKeyAction> for CliAddAccessKeyAction {
 impl AddAccessKeyAction {
     pub fn from(
         item: CliAddAccessKeyAction,
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        context: &super::super::sender::SenderContext,
+        // connection_config: Option<crate::common::ConnectionConfig>,
+        // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
         let public_key: near_crypto::PublicKey = match item.public_key {
             Some(cli_public_key) => cli_public_key,
             None => AddAccessKeyAction::input_public_key(),
         };
         let permission: AccessKeyPermission = match item.permission {
-            Some(cli_permission) => {
-                AccessKeyPermission::from(cli_permission, connection_config, sender_account_id)?
-            }
-            None => AccessKeyPermission::choose_permission(connection_config, sender_account_id)?,
+            Some(cli_permission) => AccessKeyPermission::from(cli_permission, context)?,
+            None => AccessKeyPermission::choose_permission(context)?,
         };
         Ok(Self {
             public_key,
@@ -161,15 +161,17 @@ impl From<AccessKeyPermission> for CliAccessKeyPermission {
 impl AccessKeyPermission {
     pub fn from(
         item: CliAccessKeyPermission,
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        context: &super::super::sender::SenderContext,
+        // connection_config: Option<crate::common::ConnectionConfig>,
+        // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
         match item {
             CliAccessKeyPermission::GrantFunctionCallAccess(cli_function_call_type) => {
                 let function_call_type = self::function_call_type::FunctionCallType::from(
-                    cli_function_call_type,
-                    connection_config,
-                    sender_account_id,
+                    Some(cli_function_call_type),
+                    context,
+                    // connection_config,
+                    // sender_account_id,
                 )?;
                 Ok(AccessKeyPermission::GrantFunctionCallAccess(
                     function_call_type,
@@ -178,8 +180,9 @@ impl AccessKeyPermission {
             CliAccessKeyPermission::GrantFullAccess(cli_full_access_type) => {
                 let full_access_type = self::full_access_type::FullAccessType::from(
                     cli_full_access_type,
-                    connection_config,
-                    sender_account_id,
+                    context,
+                    // connection_config,
+                    // sender_account_id,
                 )?;
                 Ok(AccessKeyPermission::GrantFullAccess(full_access_type))
             }
@@ -189,8 +192,9 @@ impl AccessKeyPermission {
 
 impl AccessKeyPermission {
     pub fn choose_permission(
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        context: &super::super::sender::SenderContext,
+        // connection_config: Option<crate::common::ConnectionConfig>,
+        // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
         let variants = AccessKeyPermissionDiscriminants::iter().collect::<Vec<_>>();
         let permissions = variants
@@ -206,13 +210,15 @@ impl AccessKeyPermission {
         match variants[select_permission] {
             AccessKeyPermissionDiscriminants::GrantFunctionCallAccess => Ok(Self::from(
                 CliAccessKeyPermission::GrantFunctionCallAccess(Default::default()),
-                connection_config,
-                sender_account_id,
+                context,
+                // connection_config,
+                // sender_account_id,
             )?),
             AccessKeyPermissionDiscriminants::GrantFullAccess => Ok(Self::from(
                 CliAccessKeyPermission::GrantFullAccess(Default::default()),
-                connection_config,
-                sender_account_id,
+                context,
+                // connection_config,
+                // sender_account_id,
             )?),
         }
     }

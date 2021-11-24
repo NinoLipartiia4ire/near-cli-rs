@@ -21,6 +21,7 @@ pub struct CliFunctionCallType {
 }
 
 #[derive(Debug, Clone)]
+// #[interactive_clap(context = super::super::super::sender::SenderContext)]
 pub struct FunctionCallType {
     pub allowance: Option<near_primitives::types::Balance>,
     pub receiver_id: near_primitives::types::AccountId,
@@ -67,19 +68,29 @@ impl From<FunctionCallType> for CliFunctionCallType {
 
 impl FunctionCallType {
     pub fn from(
-        item: CliFunctionCallType,
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        optional_clap_variant: Option<CliFunctionCallType>,
+        context: &super::super::super::sender::SenderContext,
+        // connection_config: Option<crate::common::ConnectionConfig>,
+        // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
-        let allowance: Option<near_primitives::types::Balance> = match item.allowance {
+        let allowance: Option<near_primitives::types::Balance> = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.allowance)
+        {
             Some(cli_allowance) => Some(cli_allowance.to_yoctonear()),
             None => FunctionCallType::input_allowance(),
         };
-        let receiver_id: near_primitives::types::AccountId = match item.receiver_id {
+        let receiver_id: near_primitives::types::AccountId = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.receiver_id)
+        {
             Some(cli_receiver_id) => near_primitives::types::AccountId::from(cli_receiver_id),
             None => FunctionCallType::input_receiver_id(),
         };
-        let method_names: Vec<String> = match item.method_names {
+        let method_names: Vec<String> = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.method_names)
+        {
             Some(cli_method_names) => {
                 if cli_method_names.is_empty() {
                     vec![]
@@ -92,9 +103,11 @@ impl FunctionCallType {
             }
             None => FunctionCallType::input_method_names(),
         };
-        let sign_option = match item.sign_option {
-            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(cli_sign_transaction, connection_config, sender_account_id)?,
-            None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_sign_option(connection_config, sender_account_id)?,
+        // let sender_account_id = context.sender_account_id.clone();
+        let common_context = crate::common::Context::from(context.clone()); // Временно
+        let sign_option = match optional_clap_variant.and_then(|clap_variant| clap_variant.sign_option) {
+            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), common_context)?,
+            None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(common_context)?,
         };
         Ok(Self {
             allowance,

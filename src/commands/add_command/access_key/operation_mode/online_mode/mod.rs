@@ -35,13 +35,25 @@ impl From<NetworkArgs> for CliNetworkArgs {
 }
 
 impl NetworkArgs {
-    pub fn from(item: CliNetworkArgs) -> color_eyre::eyre::Result<Self> {
-        let selected_server = match item.selected_server {
-            Some(cli_selected_server) => {
-                self::select_server::SelectServer::from(cli_selected_server)?
-            }
-            None => self::select_server::SelectServer::choose_server()?,
-        };
+    pub fn from(
+        optional_clap_variant: Option<CliNetworkArgs>,
+        context: (),
+    ) -> color_eyre::eyre::Result<Self> {
+        let selected_server =
+            match optional_clap_variant.and_then(|clap_variant| {
+                match clap_variant.selected_server {
+                    Some(cli_selected_server) => Some(
+                        self::select_server::SelectServer::from(Some(cli_selected_server), context)
+                            .unwrap(),
+                    ),
+                    None => {
+                        Some(self::select_server::SelectServer::choose_server(context).unwrap())
+                    }
+                }
+            }) {
+                Some(x) => x,
+                None => self::select_server::SelectServer::choose_server(context)?,
+            };
         Ok(Self { selected_server })
     }
 }

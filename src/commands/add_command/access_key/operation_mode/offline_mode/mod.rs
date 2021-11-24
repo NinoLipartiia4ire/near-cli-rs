@@ -7,12 +7,40 @@
 )]
 pub struct CliOfflineArgs {
     #[clap(subcommand)]
-    pub send_from: Option<super::online_mode::select_server::server::CliSendFrom>,
+    pub send_from: Option<super::super::sender::CliSendFrom>,
 }
 
 #[derive(Debug, Clone)]
+// #[interactive_clap(input_context = (), output_context = super::NetworkContext)]
 pub struct OfflineArgs {
-    send_from: super::online_mode::select_server::server::SendFrom,
+    send_from: super::super::sender::SendFrom,
+}
+
+pub struct InteractiveClapContextScopeForOfflineArgs {
+    connection_config: Option<crate::common::ConnectionConfig>,
+}
+
+impl crate::common::ToInteractiveClapContextScope for OfflineArgs {
+    type InteractiveClapContextScope = InteractiveClapContextScopeForOfflineArgs;
+}
+
+struct OfflineArgsContext {}
+
+impl OfflineArgsContext {
+    fn from_previous_context(
+        previous_context: (),
+        scope: <OfflineArgs as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+    ) -> Self {
+        Self {}
+    }
+}
+
+impl From<OfflineArgsContext> for super::NetworkContext {
+    fn from(item: OfflineArgsContext) -> Self {
+        Self {
+            connection_config: None,
+        }
+    }
 }
 
 impl CliOfflineArgs {
@@ -32,14 +60,36 @@ impl From<OfflineArgs> for CliOfflineArgs {
     }
 }
 
+// impl OfflineArgs {
+//     pub fn from(
+//         item: CliOfflineArgs,
+//         context: crate::common::Context,
+//     ) -> color_eyre::eyre::Result<Self> {
+//         let send_from = match item.send_from {
+//             Some(cli_send_from) => {
+//                 super::online_mode::select_server::server::SendFrom::from(cli_send_from, context)?
+//             }
+//             None => super::online_mode::select_server::server::SendFrom::choose_send_from(context)?,
+//         };
+//         Ok(Self { send_from })
+//     }
+// }
+
 impl OfflineArgs {
-    pub fn from(item: CliOfflineArgs) -> color_eyre::eyre::Result<Self> {
-        let send_from = match item.send_from {
-            Some(cli_send_from) => {
-                super::online_mode::select_server::server::SendFrom::from(cli_send_from, None)?
-            }
-            None => super::online_mode::select_server::server::SendFrom::choose_send_from(None)?,
+    pub fn from(
+        optional_clap_variant: Option<CliOfflineArgs>,
+        context: (),
+    ) -> color_eyre::eyre::Result<Self> {
+        let connection_config = None;
+        let new_context_scope = InteractiveClapContextScopeForOfflineArgs {
+            // todo <Self as
+            connection_config,
         };
+        let new_context: super::NetworkContext/*: NetworkContext */ = OfflineArgsContext::from_previous_context((), new_context_scope).into();
+        let send_from = super::super::sender::SendFrom::from(
+            optional_clap_variant.and_then(|clap_variant| clap_variant.send_from),
+            &new_context,
+        )?;
         Ok(Self { send_from })
     }
 }

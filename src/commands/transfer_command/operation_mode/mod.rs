@@ -14,11 +14,11 @@ pub struct OperationMode {
 
 impl OperationMode {
     pub fn from(
-        item: CliOperationMode,
+        optional_clap_variant: Option<CliOperationMode>,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<Self> {
-        let mode = match item.mode {
-            Some(cli_mode) => Mode::from(cli_mode, context)?,
+        let mode = match optional_clap_variant.and_then(|clap_variant| clap_variant.mode) {
+            Some(cli_mode) => Mode::from(Some(cli_mode), context)?,
             None => Mode::choose_variant(context)?,
         };
         Ok(Self { mode })
@@ -69,3 +69,16 @@ impl Mode {
         }
     }
 }
+
+pub struct InteractiveClapContextScopeForNetworkContext {
+    connection_config: Option<crate::common::ConnectionConfig>,
+}
+
+impl crate::common::ToInteractiveClapContextScope for NetworkContext {
+    type InteractiveClapContextScope = InteractiveClapContextScopeForNetworkContext;
+}
+
+pub struct NetworkContext {
+    pub connection_config: Option<crate::common::ConnectionConfig>,
+}
+

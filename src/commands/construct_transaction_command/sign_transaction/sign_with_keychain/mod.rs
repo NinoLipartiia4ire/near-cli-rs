@@ -20,10 +20,10 @@ impl ToCli for super::Submit {
 
 impl SignKeychain {
     pub fn from(
-        item: CliSignKeychain,
+        optional_clap_variant: Option<CliSignKeychain>,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<Self> {
-        let submit: Option<super::Submit> = item.submit;
+        let submit: Option<super::Submit> = optional_clap_variant.clone().and_then(|clap_variant| clap_variant.submit);
         match context.connection_config {
             Some(_) => Ok(Self {
                 nonce: None,
@@ -53,11 +53,11 @@ impl SignKeychain {
                     ))
                 })?;
 
-                let nonce: u64 = match item.nonce {
+                let nonce: u64 = match optional_clap_variant.clone().and_then(|clap_variant| clap_variant.nonce) {
                     Some(cli_nonce) => cli_nonce,
                     None => super::input_access_key_nonce(&account_json.public_key.to_string()),
                 };
-                let block_hash = match item.block_hash {
+                let block_hash = match optional_clap_variant.and_then(|clap_variant| clap_variant.block_hash) {
                     Some(cli_block_hash) => cli_block_hash,
                     None => super::input_block_hash(),
                 };

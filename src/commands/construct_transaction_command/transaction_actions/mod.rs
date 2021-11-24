@@ -585,7 +585,7 @@ impl SkipAction {
     ) -> color_eyre::eyre::Result<Self> {
         let sign_option: super::sign_transaction::SignTransaction = match item.sign_option {
             Some(cli_sign_transaction) => super::sign_transaction::SignTransaction::from(
-                cli_sign_transaction,
+                Some(cli_sign_transaction),
                 crate::common::Context {
                     connection_config,
                     sender_account_id: Some(sender_account_id),

@@ -10,12 +10,12 @@ pub struct NetworkArgs {
 
 impl NetworkArgs {
     pub fn from(
-        item: CliNetworkArgs,
+        optional_clap_variant: Option<CliNetworkArgs>,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<Self> {
-        let selected_server = match item.selected_server {
+        let selected_server = match optional_clap_variant.and_then(|clap_variant| clap_variant.selected_server) {
             Some(cli_selected_server) => {
-                self::select_server::SelectServer::from(cli_selected_server, context)?
+                self::select_server::SelectServer::from(Some(cli_selected_server), context)?
             }
             None => self::select_server::SelectServer::choose_variant(context)?,
         };

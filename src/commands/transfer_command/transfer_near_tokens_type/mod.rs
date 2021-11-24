@@ -41,7 +41,7 @@ impl ToCli for crate::common::NearBalance {
 
 impl TransferNEARTokensAction {
     fn from(
-        item: <TransferNEARTokensAction as ToCli>::CliVariant,
+        optional_clap_variant: Option<<TransferNEARTokensAction as ToCli>::CliVariant>,
         //context: <TransferNEARTokensAction as ToCli>::Context { connection_config: Option<crate::common::ConnectionConfig>, sender_account_id: near_primitives::types::AccountId },
         //context: (Option<crate::common::ConnectionConfig>, sender_account_id: near_primitives::types::AccountId),
         context: crate::common::Context,
@@ -62,7 +62,7 @@ impl TransferNEARTokensAction {
                         }
                         None => crate::common::NearBalance::from_yoctonear(0),
                     };
-                match item.amount {
+                match optional_clap_variant.clone().and_then(|clap_variant| clap_variant.amount) {
                     Some(cli_amount) => {
                         if cli_amount <= account_balance {
                             cli_amount
@@ -77,13 +77,13 @@ impl TransferNEARTokensAction {
                     None => TransferNEARTokensAction::input_amount(Some(account_balance)),
                 }
             }
-            None => match item.amount {
+            None => match optional_clap_variant.clone().and_then(|clap_variant| clap_variant.amount) {
                 Some(cli_amount) => cli_amount,
                 None => TransferNEARTokensAction::input_amount(None),
             },
         };
-        let sign_option = match item.sign_option {
-            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(cli_sign_transaction, context)?,
+        let sign_option = match optional_clap_variant.and_then(|clap_variant| clap_variant.sign_option) {
+            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), context)?,
             None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(context)?,
         };
         Ok(Self {

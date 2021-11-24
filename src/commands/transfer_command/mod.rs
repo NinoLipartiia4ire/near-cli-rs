@@ -9,6 +9,7 @@ mod sender;
 pub mod transfer_near_tokens_type;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(context = crate::common::Context)]
 pub struct Currency {
     #[interactive_clap(subcommand)]
     currency_selection: CurrencySelection,
@@ -16,12 +17,12 @@ pub struct Currency {
 
 impl Currency {
     pub fn from(
-        item: CliCurrency,
+        optional_clap_variant: Option<CliCurrency>,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<Self> {
-        let currency_selection = match item.currency_selection {
+        let currency_selection = match optional_clap_variant.and_then(|clap_variant| clap_variant.currency_selection) {
             Some(cli_currency_selection) => {
-                CurrencySelection::from(cli_currency_selection, context)?
+                CurrencySelection::from(Some(cli_currency_selection), context)?
             }
             None => CurrencySelection::choose_variant(context)?,
         };

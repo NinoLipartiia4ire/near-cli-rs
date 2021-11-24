@@ -301,6 +301,10 @@ impl NearGas {
     }
 }
 
+pub trait ToInteractiveClapContextScope {
+    type InteractiveClapContextScope;
+}
+
 #[derive(Debug, Clone)]
 pub enum ConnectionConfig {
     Testnet,

@@ -3,7 +3,7 @@ use interactive_clap::ToCli;
 use interactive_clap_derive::{InteractiveClap, ToCliArgs};
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
-// pub mod add_command;
+pub mod add_command;
 pub mod construct_transaction_command;
 // pub mod delete_command;
 // pub mod execute_command;
@@ -29,10 +29,10 @@ pub enum TopLevelCommand {
     Transfer(self::transfer_command::Currency),
     // #[strum_discriminants(strum(message = "Execute function (contract method)"))]
     // Execute(self::execute_command::OptionMethod),
-    // #[strum_discriminants(strum(
-    //     message = "Add access key, contract code, stake proposal, sub-account, implicit-account"
-    // ))]
-    // Add(self::add_command::AddAction),
+    #[strum_discriminants(strum(
+        message = "Add access key, contract code, stake proposal, sub-account, implicit-account"
+    ))]
+    Add(self::add_command::AddAction),
     // #[strum_discriminants(strum(message = "Delete access key, account"))]
     // Delete(self::delete_command::DeleteAction),
     // #[strum_discriminants(strum(message = "Construct a new transaction"))]
@@ -52,7 +52,7 @@ impl TopLevelCommand {
             actions: vec![],
         };
         match self {
-            // Self::Add(add_action) => add_action.process(unsigned_transaction).await,
+            Self::Add(add_action) => add_action.process(unsigned_transaction).await,
             // Self::ConstructTransaction(mode) => mode.process(unsigned_transaction).await,
             // Self::Delete(delete_action) => delete_action.process(unsigned_transaction).await,
             // Self::Execute(option_method) => option_method.process(unsigned_transaction).await,

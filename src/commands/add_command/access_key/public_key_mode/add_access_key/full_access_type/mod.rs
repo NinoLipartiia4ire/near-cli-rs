@@ -13,6 +13,7 @@ pub struct CliFullAccessType {
 }
 
 #[derive(Debug, Clone)]
+// #[interactive_clap(context = super::super::super::sender::SenderContext)]
 pub struct FullAccessType {
     pub sign_option:
         crate::commands::construct_transaction_command::sign_transaction::SignTransaction,
@@ -35,15 +36,29 @@ impl From<FullAccessType> for CliFullAccessType {
     }
 }
 
+// --- Временная имплементация
+impl From<super::super::super::sender::SenderContext> for crate::common::Context {
+    fn from(item: super::super::super::sender::SenderContext) -> Self {
+        Self {
+            connection_config: item.connection_config,
+            sender_account_id: Some(item.sender_account_id),
+        }
+    }
+}
+// ---------------------------
+
 impl FullAccessType {
     pub fn from(
         item: CliFullAccessType,
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        context: &super::super::super::sender::SenderContext,
+        // connection_config: Option<crate::common::ConnectionConfig>,
+        // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
+        // let sender_account_id = context.sender_account_id;
+        let common_context = crate::common::Context::from(context.clone()); // Временно
         let sign_option = match item.sign_option {
-            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(cli_sign_transaction, connection_config,sender_account_id)?,
-            None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_sign_option(connection_config,sender_account_id)?,
+            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), common_context)?,
+            None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(common_context)?,
         };
         Ok(Self { sign_option })
     }

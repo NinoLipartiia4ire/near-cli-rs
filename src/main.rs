@@ -20,7 +20,7 @@ impl From<CliArgs> for Args {
         let context = crate::common::Context::default();
         let top_level_command = match cli_args.top_level_command {
             Some(cli_subcommand) => {
-                self::commands::TopLevelCommand::from(cli_subcommand, context).unwrap()
+                self::commands::TopLevelCommand::from(Some(cli_subcommand), context).unwrap()
             }
             None => self::commands::TopLevelCommand::choose_variant(context).unwrap(),
         };

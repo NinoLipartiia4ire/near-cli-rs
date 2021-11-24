@@ -9,10 +9,10 @@ pub struct OfflineArgs {
 
 impl OfflineArgs {
     pub fn from(
-        item: CliOfflineArgs,
+        optional_clap_variant: Option<CliOfflineArgs>,
         context: crate::common::Context,
     ) -> color_eyre::eyre::Result<Self> {
-        let optional_clap_variant = Some(item);
+        // let optional_clap_variant = Some(item);
         // let send_from = match item.send_from {
         //     Some(cli_send_from) => {
         //         super::online_mode::select_server::server::SendFrom::from(cli_send_from, context)?

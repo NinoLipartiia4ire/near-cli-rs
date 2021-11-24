@@ -39,10 +39,13 @@ impl From<OperationMode> for CliOperationMode {
 }
 
 impl OperationMode {
-    pub fn from(item: CliOperationMode) -> color_eyre::eyre::Result<Self> {
-        let mode = match item.mode {
-            Some(cli_mode) => Mode::from(cli_mode)?,
-            None => Mode::choose_mode()?,
+    pub fn from(
+        optional_clap_variant: Option<CliOperationMode>,
+        context: (),
+    ) -> color_eyre::eyre::Result<Self> {
+        let mode = match optional_clap_variant.and_then(|clap_variant| clap_variant.mode) {
+            Some(cli_mode) => Mode::from(Some(cli_mode), context)?,
+            None => Mode::choose_mode(context)?,
         };
         Ok(Self { mode })
     }
@@ -107,20 +110,23 @@ impl From<Mode> for CliMode {
 }
 
 impl Mode {
-    fn from(item: CliMode) -> color_eyre::eyre::Result<Self> {
-        match item {
-            CliMode::Network(cli_network_args) => Ok(Self::Network(
-                self::online_mode::NetworkArgs::from(cli_network_args)?,
+    fn from(optional_clap_variant: Option<CliMode>, context: ()) -> color_eyre::eyre::Result<Self> {
+        match optional_clap_variant.and_then(|clap_variant| match clap_variant {
+            CliMode::Network(cli_network_args) => Some(Self::Network(
+                self::online_mode::NetworkArgs::from(Some(cli_network_args), context).ok()?,
             )),
-            CliMode::Offline(cli_offline_args) => Ok(Self::Offline(
-                self::offline_mode::OfflineArgs::from(cli_offline_args)?,
+            CliMode::Offline(cli_offline_args) => Some(Self::Offline(
+                self::offline_mode::OfflineArgs::from(Some(cli_offline_args), context).ok()?,
             )),
+        }) {
+            Some(x) => Ok(x),
+            None => Self::choose_mode(context),
         }
     }
 }
 
 impl Mode {
-    fn choose_mode() -> color_eyre::eyre::Result<Self> {
+    fn choose_mode(context: ()) -> color_eyre::eyre::Result<Self> {
         println!();
         let variants = ModeDiscriminants::iter().collect::<Vec<_>>();
         let modes = variants
@@ -140,7 +146,7 @@ impl Mode {
             ModeDiscriminants::Network => CliMode::Network(Default::default()),
             ModeDiscriminants::Offline => CliMode::Offline(Default::default()),
         };
-        Ok(Self::from(cli_mode)?)
+        Ok(Self::from(Some(cli_mode), context)?)
     }
 
     pub async fn process(
@@ -161,3 +167,39 @@ impl Mode {
         }
     }
 }
+
+pub struct InteractiveClapContextScopeForNetworkContext {
+    connection_config: Option<crate::common::ConnectionConfig>,
+}
+
+impl crate::common::ToInteractiveClapContextScope for NetworkContext {
+    type InteractiveClapContextScope = InteractiveClapContextScopeForNetworkContext;
+}
+
+pub struct NetworkContext {
+    pub connection_config: Option<crate::common::ConnectionConfig>,
+}
+
+// impl NetworkContext {
+//     fn from_previous_context(previous_context: (), scope: Network::InteractiveClapContextScope) -> Self {
+//         Self {
+//             connection_config: Option<crate::common::ConnectionConfig>
+//         }
+//     }
+// }
+
+// impl From<OnlineModeContext> for NetworkContext {
+//     fn from(online_context: OnlineModeContext) -> Self {
+//         Self {
+//             connection_config: Some(online_context.connection_config),
+//         }
+//     }
+// }
+
+// impl From<OfflineModeContext> for NetworkContext {
+//     fn from(online_context: OfflineModeContext) -> Self {
+//         Self {
+//             connection_config: None,
+//         }
+//     }
+// }
