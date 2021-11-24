@@ -76,7 +76,7 @@ pub struct CustomServer {
 }
 
 pub struct InteractiveClapContextScopeForCustomServer {
-    connection_config: Option<crate::common::ConnectionConfig>,
+    pub url: crate::common::AvailableRpcServerUrl,
 }
 
 impl crate::common::ToInteractiveClapContextScope for CustomServer {
@@ -84,7 +84,7 @@ impl crate::common::ToInteractiveClapContextScope for CustomServer {
 }
 
 struct CustomServerContext {
-    connection_config: crate::common::ConnectionConfig,
+    pub url: crate::common::AvailableRpcServerUrl,
 }
 
 impl CustomServerContext {
@@ -92,16 +92,16 @@ impl CustomServerContext {
         previous_context: (),
         scope: <CustomServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
-        Self {
-            connection_config: scope.connection_config.unwrap(),
-        }
+        Self { url: scope.url }
     }
 }
 
 impl From<CustomServerContext> for super::super::super::NetworkContext {
     fn from(item: CustomServerContext) -> Self {
         Self {
-            connection_config: Some(item.connection_config),
+            connection_config: Some(crate::common::ConnectionConfig::Custom {
+                url: item.url.inner,
+            }),
         }
     }
 }
@@ -188,7 +188,10 @@ impl Server {
         optional_clap_variant: Option<CliServer>,
         context: &super::super::super::NetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let connection_config = context.connection_config.clone().expect("connection_config does not exist");
+        let connection_config = context
+            .connection_config
+            .clone()
+            .expect("connection_config does not exist");
         // let connection_config = match optional_clap_variant
         //     .clone()
         //     .and_then(|clap_variant| clap_variant.connection_config)
@@ -203,7 +206,7 @@ impl Server {
         let send_from = super::super::super::super::sender::SendFrom::from(
             optional_clap_variant.and_then(|clap_variant| clap_variant.send_from),
             // &new_context,
-            context
+            context,
         )?;
         Ok(Self {
             connection_config,

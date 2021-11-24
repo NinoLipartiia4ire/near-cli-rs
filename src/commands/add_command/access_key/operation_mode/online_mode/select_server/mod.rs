@@ -77,16 +77,14 @@ impl From<SelectServer> for CliSelectServer {
     }
 }
 
-pub struct InteractiveClapContextScopeForSelectServer {
-    connection_config: Option<crate::common::ConnectionConfig>,
-}
+pub type InteractiveClapContextScopeForSelectServer = SelectServerDiscriminants;
 
 impl crate::common::ToInteractiveClapContextScope for SelectServer {
     type InteractiveClapContextScope = InteractiveClapContextScopeForSelectServer;
 }
 
 struct SelectServerContext {
-    connection_config: crate::common::ConnectionConfig,
+    selected_server: SelectServerDiscriminants,
 }
 
 impl SelectServerContext {
@@ -95,15 +93,21 @@ impl SelectServerContext {
         scope: <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {
-            connection_config: scope.connection_config.unwrap(),
+            selected_server: scope,
         }
     }
 }
 
 impl From<SelectServerContext> for super::super::NetworkContext {
     fn from(item: SelectServerContext) -> Self {
+        let connection_config = match item.selected_server {
+            SelectServerDiscriminants::Testnet => crate::common::ConnectionConfig::Testnet,
+            SelectServerDiscriminants::Mainnet => crate::common::ConnectionConfig::Mainnet,
+            SelectServerDiscriminants::Betanet => crate::common::ConnectionConfig::Betanet,
+            SelectServerDiscriminants::Custom => unreachable!("Network context should not be constructed from Custom variant"),
+        };
         Self {
-            connection_config: Some(item.connection_config),
+            connection_config: Some(connection_config),
         }
     }
 }
@@ -138,9 +142,7 @@ impl SelectServer {
         match optional_clap_variant.and_then(|clap_variant| match clap_variant {
             CliSelectServer::Testnet(cli_server) => {
                 type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
-                let new_context_scope = Alias {
-                    connection_config: Some(crate::common::ConnectionConfig::Testnet),
-                };
+                let new_context_scope = Alias::Testnet;
                 let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
                 Some(Self::Testnet(
                     self::server::Server::from(Some(cli_server), &new_context).ok()?,
@@ -148,9 +150,7 @@ impl SelectServer {
             }
             CliSelectServer::Mainnet(cli_server) => {
                 type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
-                let new_context_scope = Alias {
-                    connection_config: Some(crate::common::ConnectionConfig::Mainnet),
-                };
+                let new_context_scope = Alias::Mainnet;
                 let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();                
                 Some(Self::Mainnet(
                     self::server::Server::from(Some(cli_server), &new_context).ok()?,
@@ -158,19 +158,15 @@ impl SelectServer {
             }
             CliSelectServer::Betanet(cli_server) => {
                 type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
-                let new_context_scope = Alias {
-                    connection_config: Some(crate::common::ConnectionConfig::Betanet),
-                };
+                let new_context_scope = Alias::Betanet;
                 let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
                 Some(Self::Betanet(
                     self::server::Server::from(Some(cli_server), &new_context).ok()?,
                 ))
             }
             CliSelectServer::Custom(cli_custom_server) => {
-                let custom_url = self::server::CustomServer::input_url();
-                let new_context_scope = InteractiveClapContextScopeForSelectServer {// <Self as
-                    connection_config: Some(crate::common::ConnectionConfig::from_custom_url(&custom_url))
-                };
+                type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
+                let new_context_scope = Alias::Custom;
                 let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
                 Some(Self::Custom(
                     self::server::CustomServer::from(Some(cli_custom_server), &new_context).ok()?,

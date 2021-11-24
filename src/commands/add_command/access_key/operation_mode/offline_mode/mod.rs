@@ -16,9 +16,7 @@ pub struct OfflineArgs {
     send_from: super::super::sender::SendFrom,
 }
 
-pub struct InteractiveClapContextScopeForOfflineArgs {
-    connection_config: Option<crate::common::ConnectionConfig>,
-}
+pub struct InteractiveClapContextScopeForOfflineArgs {}
 
 impl crate::common::ToInteractiveClapContextScope for OfflineArgs {
     type InteractiveClapContextScope = InteractiveClapContextScopeForOfflineArgs;
@@ -80,10 +78,8 @@ impl OfflineArgs {
         optional_clap_variant: Option<CliOfflineArgs>,
         context: (),
     ) -> color_eyre::eyre::Result<Self> {
-        let connection_config = None;
         let new_context_scope = InteractiveClapContextScopeForOfflineArgs {
             // todo <Self as
-            connection_config,
         };
         let new_context: super::NetworkContext/*: NetworkContext */ = OfflineArgsContext::from_previous_context((), new_context_scope).into();
         let send_from = super::super::sender::SendFrom::from(
