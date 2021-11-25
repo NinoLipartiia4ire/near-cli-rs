@@ -10,51 +10,22 @@ use dialoguer::Input;
     setting(clap::AppSettings::VersionlessSubcommands)
 )]
 pub struct CliServer {
-    #[clap(skip)]
-    pub connection_config: Option<crate::common::ConnectionConfig>,
     #[clap(subcommand)]
     pub send_from: Option<super::super::super::super::sender::CliSendFrom>,
 }
 
 #[derive(Debug, Clone)]
-// #[interactive_clap(input_context = (), output_context = super::NetworkContext)]
+// #[interactive_clap(context = super::SelectServerContext)]
 pub struct Server {
-    pub connection_config: crate::common::ConnectionConfig,
     pub send_from: super::super::super::super::sender::SendFrom,
 }
 
-pub struct InteractiveClapContextScopeForServer {
-    connection_config: Option<crate::common::ConnectionConfig>,
-}
+pub struct InteractiveClapContextScopeForServer {}
 
 impl crate::common::ToInteractiveClapContextScope for Server {
     type InteractiveClapContextScope = InteractiveClapContextScopeForServer;
 }
 
-struct ServerContext {
-    connection_config: crate::common::ConnectionConfig,
-}
-
-impl ServerContext {
-    fn from_previous_context(
-        previous_context: (),
-        scope: <Server as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
-    ) -> Self {
-        Self {
-            connection_config: scope.connection_config.unwrap(),
-        }
-    }
-}
-
-impl From<ServerContext> for super::super::super::NetworkContext {
-    fn from(item: ServerContext) -> Self {
-        Self {
-            connection_config: Some(item.connection_config),
-        }
-    }
-}
-
-/// данные для custom server
 #[derive(Debug, Default, Clone, clap::Clap)]
 #[clap(
     setting(clap::AppSettings::ColoredHelp),
@@ -69,7 +40,7 @@ pub struct CliCustomServer {
 }
 
 #[derive(Debug, Clone)]
-// #[interactive_clap(input_context = (), output_context = super::NetworkContext)]
+// #[interactive_clap(input_context = SelectServerContext, output_context = CustomServerContext)]
 pub struct CustomServer {
     pub url: crate::common::AvailableRpcServerUrl,
     pub send_from: super::super::super::super::sender::SendFrom,
@@ -89,19 +60,19 @@ struct CustomServerContext {
 
 impl CustomServerContext {
     fn from_previous_context(
-        previous_context: (),
-        scope: <CustomServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+        previous_context: super::SelectServerContext,
+        scope: &<CustomServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
-        Self { url: scope.url }
+        Self {
+            url: scope.url.clone(),
+        }
     }
 }
 
 impl From<CustomServerContext> for super::super::super::NetworkContext {
     fn from(item: CustomServerContext) -> Self {
         Self {
-            connection_config: Some(crate::common::ConnectionConfig::Custom {
-                url: item.url.inner,
-            }),
+            connection_config: Some(crate::common::ConnectionConfig::from_custom_url(&item.url)),
         }
     }
 }
@@ -124,7 +95,7 @@ impl CliCustomServer {
 impl CustomServer {
     pub fn from(
         optional_clap_variant: Option<CliCustomServer>,
-        context: &super::super::super::NetworkContext,
+        context: super::SelectServerContext,
     ) -> color_eyre::eyre::Result<Self> {
         let url: crate::common::AvailableRpcServerUrl = match optional_clap_variant
             .clone()
@@ -136,16 +107,19 @@ impl CustomServer {
                 .interact_text()
                 .unwrap(),
         };
-        let connection_config = crate::common::ConnectionConfig::from_custom_url(&url);
-        let new_context_scope = InteractiveClapContextScopeForServer {// todo <Self as
-            connection_config: Some(connection_config),
+        let new_context_scope = InteractiveClapContextScopeForCustomServer {
+            // todo <Self as
+            url,
         };
-        let new_context: super::super::super::NetworkContext/*: NetworkContext */ = ServerContext::from_previous_context((), new_context_scope).into();
+        let new_context/*: CustomServerContext */ = CustomServerContext::from_previous_context(context, &new_context_scope);
         let send_from = super::super::super::super::sender::SendFrom::from(
             optional_clap_variant.and_then(|clap_variant| clap_variant.send_from),
-            &new_context,
+            new_context.into(),
         )?;
-        Ok(Self { url, send_from })
+        Ok(Self {
+            url: new_context_scope.url,
+            send_from,
+        })
     }
 
     pub fn input_url() -> crate::common::AvailableRpcServerUrl {
@@ -177,7 +151,6 @@ impl CliServer {
 impl From<Server> for CliServer {
     fn from(server: Server) -> Self {
         Self {
-            connection_config: Some(server.connection_config.into()),
             send_from: Some(server.send_from.into()),
         }
     }
@@ -186,128 +159,24 @@ impl From<Server> for CliServer {
 impl Server {
     pub fn from(
         optional_clap_variant: Option<CliServer>,
-        context: &super::super::super::NetworkContext,
+        context: super::SelectServerContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let connection_config = context
-            .connection_config
-            .clone()
-            .expect("connection_config does not exist");
-        // let connection_config = match optional_clap_variant
-        //     .clone()
-        //     .and_then(|clap_variant| clap_variant.connection_config)
-        // {
-        //     Some(connection_config) => connection_config,
-        //     None => Self::input_connection_config(context)?,
-        // };
-        let new_context_scope = InteractiveClapContextScopeForServer {// todo <Self as
-            connection_config: Some(connection_config.clone()),
-        };
-        // let new_context: super::super::super::NetworkContext/*: NetworkContext */ = ServerContext::from_previous_context((), new_context_scope).into();
         let send_from = super::super::super::super::sender::SendFrom::from(
             optional_clap_variant.and_then(|clap_variant| clap_variant.send_from),
-            // &new_context,
-            context,
+            context.into(),
         )?;
-        Ok(Self {
-            connection_config,
-            send_from,
-        })
+        Ok(Self { send_from })
     }
-    // pub fn from(
-    //     item: CliServer,
-    //     context: super::SelectServerContext,
-    // ) -> color_eyre::eyre::Result<Self> {
-    //     let connection_config = context.connection_config;
-    //     let send_from = match item.send_from {
-    //         Some(cli_send_from) => super::super::super::super::sender::SendFrom::from(cli_send_from, context.connection_config)?,
-    //         None => super::super::super::super::sender::SendFrom::choose_send_from(context.connection_config)?
-    //     };
-    //     Ok(Self {
-    //         connection_config,
-    //         send_from
-    //     })
-    // }
-
-    fn input_connection_config(
-        context: (),
-    ) -> color_eyre::eyre::Result<crate::common::ConnectionConfig> {
-        println!("/////////  input connection config /////////// ");
-        let selected_server = super::SelectServer::choose_server(context)?;
-        println!(
-            "/////////  input connection config /////////// {:?}",
-            &selected_server
-        );
-        Ok(match selected_server {
-            super::SelectServer::Testnet(server) => crate::common::ConnectionConfig::Testnet,
-            super::SelectServer::Mainnet(server) => crate::common::ConnectionConfig::Mainnet,
-            super::SelectServer::Betanet(server) => crate::common::ConnectionConfig::Betanet,
-            super::SelectServer::Custom(custom_server) => {
-                let custom_url = super::server::CustomServer::input_url();
-                crate::common::ConnectionConfig::from_custom_url(&custom_url)
-            }
-        })
-    }
-}
-
-impl CliServer {
-    // pub fn into_server(
-    //     self,
-    //     connection_config: crate::common::ConnectionConfig,
-    //     context: (),
-    //     optional_clap_variant: Option<Server>
-    // ) -> color_eyre::eyre::Result<Server> {
-    //     // let context = crate::common::Context {
-    //     //     connection_config: Some(connection_config.clone()),
-    //     //     ..context
-    //     // };
-    //     // let send_from = match self.send_from {
-    //     //     Some(cli_send_from) => SendFrom::from(cli_send_from, context)?,
-    //     //     None => SendFrom::choose_send_from(context)?,
-    //     // };
-    //     Ok(Server {
-    //         connection_config: Some(connection_config),
-    //         send_from,
-    //     })
-    // }
-}
-
-impl CliCustomServer {
-    // pub fn into_server(self, context: crate::common::Context) -> color_eyre::eyre::Result<CustomServer> {
-    //     let url: crate::common::AvailableRpcServerUrl = match self.url {
-    //         Some(url) => url,
-    //         None => Input::new()
-    //             .with_prompt("What is the RPC endpoint?")
-    //             .interact_text()
-    //             .unwrap(),
-    //     };
-    //     let connection_config = Some(crate::common::ConnectionConfig::Custom {
-    //         url: url.inner.clone(),
-    //     });
-    //     let context = crate::common::Context {
-    //         connection_config: connection_config.clone(),
-    //         ..context
-    //     };
-    //     let send_from = match self.send_from {
-    //         Some(cli_send_from) => super::super::super::super::sender::SendFrom::from(cli_send_from, context)?,
-    //         None => super::super::super::super::sender::SendFrom::choose_send_from(context)?,
-    //     };
-    //     Ok(CustomServer {
-    //         url,
-    //         send_from,
-    //     })
-    // }
 }
 
 impl Server {
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,
+        connection_config: crate::common::ConnectionConfig,
     ) -> crate::CliResult {
         self.send_from
-            .process(
-                prepopulated_unsigned_transaction,
-                Some(self.connection_config),
-            )
+            .process(prepopulated_unsigned_transaction, Some(connection_config))
             .await
     }
 }

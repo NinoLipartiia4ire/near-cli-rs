@@ -17,6 +17,7 @@ pub enum CliSelectServer {
 
 #[derive(Debug, Clone, EnumDiscriminants)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
+// #[interactive_clap(input_context = (), output_context = SelectServerContext)]
 pub enum SelectServer {
     #[strum_discriminants(strum(message = "Testnet"))]
     Testnet(self::server::Server),
@@ -27,17 +28,6 @@ pub enum SelectServer {
     #[strum_discriminants(strum(message = "Custom"))]
     Custom(self::server::CustomServer),
 }
-
-// pub enum SelectServerScope {
-//     #[strum_discriminants(strum(message = "Testnet"))]
-//     Testnet(),
-//     #[strum_discriminants(strum(message = "Mainnet"))]
-//     Mainnet(),
-//     #[strum_discriminants(strum(message = "Betanet"))]
-//     Betanet(),
-//     #[strum_discriminants(strum(message = "Custom"))]
-//     Custom(),
-// }
 
 impl CliSelectServer {
     pub fn to_cli_args(&self) -> std::collections::VecDeque<String> {
@@ -83,7 +73,7 @@ impl crate::common::ToInteractiveClapContextScope for SelectServer {
     type InteractiveClapContextScope = InteractiveClapContextScopeForSelectServer;
 }
 
-struct SelectServerContext {
+pub struct SelectServerContext {
     selected_server: SelectServerDiscriminants,
 }
 
@@ -104,7 +94,9 @@ impl From<SelectServerContext> for super::super::NetworkContext {
             SelectServerDiscriminants::Testnet => crate::common::ConnectionConfig::Testnet,
             SelectServerDiscriminants::Mainnet => crate::common::ConnectionConfig::Mainnet,
             SelectServerDiscriminants::Betanet => crate::common::ConnectionConfig::Betanet,
-            SelectServerDiscriminants::Custom => unreachable!("Network context should not be constructed from Custom variant"),
+            SelectServerDiscriminants::Custom => {
+                unreachable!("Network context should not be constructed from Custom variant")
+            }
         };
         Self {
             connection_config: Some(connection_config),
@@ -143,33 +135,33 @@ impl SelectServer {
             CliSelectServer::Testnet(cli_server) => {
                 type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
                 let new_context_scope = Alias::Testnet;
-                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
+                let new_context = SelectServerContext::from_previous_context((), new_context_scope);
                 Some(Self::Testnet(
-                    self::server::Server::from(Some(cli_server), &new_context).ok()?,
+                    self::server::Server::from(Some(cli_server), new_context.into()).ok()?,
                 ))
             }
             CliSelectServer::Mainnet(cli_server) => {
                 type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
                 let new_context_scope = Alias::Mainnet;
-                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();                
+                let new_context = SelectServerContext::from_previous_context((), new_context_scope);
                 Some(Self::Mainnet(
-                    self::server::Server::from(Some(cli_server), &new_context).ok()?,
+                    self::server::Server::from(Some(cli_server), new_context.into()).ok()?,
                 ))
             }
             CliSelectServer::Betanet(cli_server) => {
                 type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
                 let new_context_scope = Alias::Betanet;
-                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
+                let new_context = SelectServerContext::from_previous_context((), new_context_scope);
                 Some(Self::Betanet(
-                    self::server::Server::from(Some(cli_server), &new_context).ok()?,
+                    self::server::Server::from(Some(cli_server), new_context.into()).ok()?,
                 ))
             }
             CliSelectServer::Custom(cli_custom_server) => {
                 type Alias = <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
                 let new_context_scope = Alias::Custom;
-                let new_context: super::super::NetworkContext/*: NetworkContext */ = SelectServerContext::from_previous_context((), new_context_scope).into();
+                let new_context = SelectServerContext::from_previous_context((), new_context_scope);
                 Some(Self::Custom(
-                    self::server::CustomServer::from(Some(cli_custom_server), &new_context).ok()?,
+                    self::server::CustomServer::from(Some(cli_custom_server), new_context.into()).ok()?,
                 ))
             }
         }) {
@@ -226,16 +218,27 @@ impl SelectServer {
     ) -> crate::CliResult {
         Ok(match self {
             SelectServer::Testnet(server) => {
-                server.process(prepopulated_unsigned_transaction).await?;
+                let connection_config = crate::common::ConnectionConfig::Testnet;
+                server
+                    .process(prepopulated_unsigned_transaction, connection_config)
+                    .await?;
             }
             SelectServer::Mainnet(server) => {
-                server.process(prepopulated_unsigned_transaction).await?;
+                let connection_config = crate::common::ConnectionConfig::Mainnet;
+                server
+                    .process(prepopulated_unsigned_transaction, connection_config)
+                    .await?;
             }
             SelectServer::Betanet(server) => {
-                server.process(prepopulated_unsigned_transaction).await?;
+                let connection_config = crate::common::ConnectionConfig::Betanet;
+                server
+                    .process(prepopulated_unsigned_transaction, connection_config)
+                    .await?;
             }
-            SelectServer::Custom(server) => {
-                server.process(prepopulated_unsigned_transaction).await?;
+            SelectServer::Custom(custom_server) => {
+                custom_server
+                    .process(prepopulated_unsigned_transaction)
+                    .await?;
             }
         })
     }

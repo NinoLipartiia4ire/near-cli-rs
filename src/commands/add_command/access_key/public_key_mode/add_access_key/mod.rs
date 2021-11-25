@@ -53,7 +53,7 @@ impl From<AddAccessKeyAction> for CliAddAccessKeyAction {
 impl AddAccessKeyAction {
     pub fn from(
         item: CliAddAccessKeyAction,
-        context: &super::super::sender::SenderContext,
+        context: super::super::sender::SenderContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
         // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
@@ -161,7 +161,7 @@ impl From<AccessKeyPermission> for CliAccessKeyPermission {
 impl AccessKeyPermission {
     pub fn from(
         item: CliAccessKeyPermission,
-        context: &super::super::sender::SenderContext,
+        context: super::super::sender::SenderContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
         // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
@@ -192,7 +192,7 @@ impl AccessKeyPermission {
 
 impl AccessKeyPermission {
     pub fn choose_permission(
-        context: &super::super::sender::SenderContext,
+        context: super::super::sender::SenderContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
         // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {

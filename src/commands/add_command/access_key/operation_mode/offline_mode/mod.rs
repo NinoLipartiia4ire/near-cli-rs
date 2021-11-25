@@ -84,7 +84,7 @@ impl OfflineArgs {
         let new_context: super::NetworkContext/*: NetworkContext */ = OfflineArgsContext::from_previous_context((), new_context_scope).into();
         let send_from = super::super::sender::SendFrom::from(
             optional_clap_variant.and_then(|clap_variant| clap_variant.send_from),
-            &new_context,
+            new_context,
         )?;
         Ok(Self { send_from })
     }

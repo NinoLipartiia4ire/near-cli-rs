@@ -50,12 +50,12 @@ impl From<super::super::super::sender::SenderContext> for crate::common::Context
 impl FullAccessType {
     pub fn from(
         item: CliFullAccessType,
-        context: &super::super::super::sender::SenderContext,
+        context: super::super::super::sender::SenderContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
         // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
         // let sender_account_id = context.sender_account_id;
-        let common_context = crate::common::Context::from(context.clone()); // Временно
+        let common_context = crate::common::Context::from(context); // Временно
         let sign_option = match item.sign_option {
             Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), common_context)?,
             None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(common_context)?,

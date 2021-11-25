@@ -36,14 +36,12 @@ impl From<SendFrom> for CliSendFrom {
 impl SendFrom {
     pub fn from(
         optional_clap_variant: Option<CliSendFrom>,
-        context: &super::operation_mode::NetworkContext,
+        context: super::operation_mode::NetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
-        match optional_clap_variant.and_then(|clap_variant| match clap_variant {
-            CliSendFrom::Account(cli_sender) => Some(Self::Account(
-                Sender::from(Some(cli_sender), context).unwrap(),
-            )),
-        }) {
-            Some(x) => Ok(x),
+        match optional_clap_variant {
+            Some(CliSendFrom::Account(cli_sender)) => {
+                Ok(Self::Account(Sender::from(Some(cli_sender), context)?))
+            }
             None => Self::choose_send_from(context),
         }
     }
@@ -51,7 +49,7 @@ impl SendFrom {
 
 impl SendFrom {
     pub fn choose_send_from(
-        context: &super::operation_mode::NetworkContext,
+        context: super::operation_mode::NetworkContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
     ) -> color_eyre::eyre::Result<Self> {
         Self::from(Some(CliSendFrom::Account(Default::default())), context)
@@ -105,9 +103,6 @@ pub struct SenderContext {
     pub connection_config: Option<crate::common::ConnectionConfig>,
     pub sender_account_id: near_primitives::types::AccountId,
 }
-
-
-
 
 impl CliSender {
     pub fn to_cli_args(&self) -> std::collections::VecDeque<String> {
@@ -180,7 +175,7 @@ impl From<Sender> for CliSender {
 // }
 impl SenderContext {
     fn from_previous_context(
-        previous_context: &super::operation_mode::NetworkContext,
+        previous_context: super::operation_mode::NetworkContext,
         scope: &<Sender as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {
@@ -193,7 +188,7 @@ impl SenderContext {
 impl Sender {
     fn from(
         optional_clap_variant: Option<CliSender>,
-        context: &super::operation_mode::NetworkContext,
+        context: super::operation_mode::NetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
         let sender_account_id = match optional_clap_variant
             .clone()
@@ -203,14 +198,13 @@ impl Sender {
             None => Self::input_sender_account_id(&context)?,
         };
         // let new_context_scope = <Self as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope::from_sender_account_id(sender_account_id);
-        type Alias = <Sender as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
-        let new_context_scope = Alias {
-            sender_account_id
-        };
+        type Alias =
+            <Sender as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
+        let new_context_scope = Alias { sender_account_id };
         let new_context /*: SignerContext */ = SenderContext::from_previous_context(context, &new_context_scope);
         let public_key_mode = super::public_key_mode::PublicKeyMode::from(
             optional_clap_variant.and_then(|clap_variant| clap_variant.public_key_mode),
-            &new_context,
+            new_context,
         )?;
         Ok(Self {
             sender_account_id: new_context_scope.sender_account_id,

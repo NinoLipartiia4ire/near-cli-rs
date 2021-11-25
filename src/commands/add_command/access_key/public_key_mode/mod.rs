@@ -55,35 +55,31 @@ impl From<PublicKeyMode> for CliPublicKeyMode {
 impl PublicKeyMode {
     pub fn from(
         optional_clap_variant: Option<CliPublicKeyMode>,
-        context: &super::sender::SenderContext,
+        context: super::sender::SenderContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
         // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
-        match optional_clap_variant.and_then(|clap_variant| match clap_variant {
-            CliPublicKeyMode::PublicKey(cli_add_access_key_action) => {
-                Some(PublicKeyMode::PublicKey(
+        match optional_clap_variant {
+            Some(CliPublicKeyMode::PublicKey(cli_add_access_key_action)) => {
+                Ok(PublicKeyMode::PublicKey(
                     self::add_access_key::AddAccessKeyAction::from(
                         cli_add_access_key_action,
                         context,
                         // connection_config,
                         // sender_account_id,
-                    )
-                    .unwrap(),
+                    )?,
                 ))
             }
-            CliPublicKeyMode::GenerateKeypair(cli_generate_keypair) => {
-                Some(PublicKeyMode::GenerateKeypair(
+            Some(CliPublicKeyMode::GenerateKeypair(cli_generate_keypair)) => {
+                Ok(PublicKeyMode::GenerateKeypair(
                     self::generate_keypair::GenerateKeypair::from(
                         Some(cli_generate_keypair),
                         context,
                         // connection_config,
                         // sender_account_id,
-                    )
-                    .unwrap(),
+                    )?,
                 ))
             }
-        }) {
-            Some(x) => Ok(x),
             None => PublicKeyMode::choose_public_key_mode(context),
         }
     }
@@ -91,7 +87,7 @@ impl PublicKeyMode {
 
 impl PublicKeyMode {
     pub fn choose_public_key_mode(
-        context: &super::sender::SenderContext,
+        context: super::sender::SenderContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
         // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {

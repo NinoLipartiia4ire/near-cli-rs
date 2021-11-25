@@ -69,7 +69,7 @@ impl From<FunctionCallType> for CliFunctionCallType {
 impl FunctionCallType {
     pub fn from(
         optional_clap_variant: Option<CliFunctionCallType>,
-        context: &super::super::super::sender::SenderContext,
+        context: super::super::super::sender::SenderContext,
         // connection_config: Option<crate::common::ConnectionConfig>,
         // sender_account_id: near_primitives::types::AccountId,
     ) -> color_eyre::eyre::Result<Self> {
