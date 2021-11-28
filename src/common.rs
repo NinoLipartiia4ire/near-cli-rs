@@ -30,10 +30,16 @@ where
     variants[selected]
 }
 
-#[derive(Debug, Default, Clone)]
-pub struct Context {
+// #[derive(Debug, Default, Clone)]
+// pub struct Context {
+//     pub connection_config: Option<ConnectionConfig>,
+//     pub sender_account_id: Option<near_primitives::types::AccountId>,
+// }
+
+#[derive(Clone)]
+pub struct SenderContext {
     pub connection_config: Option<ConnectionConfig>,
-    pub sender_account_id: Option<near_primitives::types::AccountId>,
+    pub sender_account_id: crate::types::account_id::AccountId,
 }
 
 #[derive(

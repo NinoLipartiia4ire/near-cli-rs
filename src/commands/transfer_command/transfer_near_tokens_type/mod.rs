@@ -4,7 +4,7 @@ use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
 #[derive(Debug, Clone, InteractiveClap)]
-#[interactive_clap(context = crate::common::Context)]
+#[interactive_clap(context = crate::common::SenderContext)]
 #[interactive_clap(disable_strum_discriminants)]
 pub enum Transfer {
     /// Enter an amount to transfer
@@ -28,6 +28,7 @@ impl Transfer {
 }
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(context = super::sender::SenderContext)]
 pub struct TransferNEARTokensAction {
     pub amount: crate::common::NearBalance,
     #[interactive_clap(subcommand)]
@@ -42,27 +43,24 @@ impl ToCli for crate::common::NearBalance {
 impl TransferNEARTokensAction {
     fn from(
         optional_clap_variant: Option<<TransferNEARTokensAction as ToCli>::CliVariant>,
-        //context: <TransferNEARTokensAction as ToCli>::Context { connection_config: Option<crate::common::ConnectionConfig>, sender_account_id: near_primitives::types::AccountId },
-        //context: (Option<crate::common::ConnectionConfig>, sender_account_id: near_primitives::types::AccountId),
-        context: crate::common::Context,
+        context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let sender_account_id = context
-            .sender_account_id
-            .clone()
-            .expect("wrong sender_account_id");
         let amount: crate::common::NearBalance = match context.connection_config.clone() {
             Some(network_connection_config) => {
                 let account_balance: crate::common::NearBalance =
                     match crate::common::check_account_id(
                         network_connection_config.clone(),
-                        sender_account_id.clone(),
+                        context.clone().sender_account_id.into(),
                     )? {
                         Some(account_view) => {
                             crate::common::NearBalance::from_yoctonear(account_view.amount)
                         }
                         None => crate::common::NearBalance::from_yoctonear(0),
                     };
-                match optional_clap_variant.clone().and_then(|clap_variant| clap_variant.amount) {
+                match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.amount)
+                {
                     Some(cli_amount) => {
                         if cli_amount <= account_balance {
                             cli_amount
@@ -77,7 +75,10 @@ impl TransferNEARTokensAction {
                     None => TransferNEARTokensAction::input_amount(Some(account_balance)),
                 }
             }
-            None => match optional_clap_variant.clone().and_then(|clap_variant| clap_variant.amount) {
+            None => match optional_clap_variant
+                .clone()
+                .and_then(|clap_variant| clap_variant.amount)
+            {
                 Some(cli_amount) => cli_amount,
                 None => TransferNEARTokensAction::input_amount(None),
             },

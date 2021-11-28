@@ -9,7 +9,7 @@ mod sender;
 pub mod transfer_near_tokens_type;
 
 #[derive(Debug, Clone, InteractiveClap)]
-#[interactive_clap(context = crate::common::Context)]
+#[interactive_clap(context = ())]
 pub struct Currency {
     #[interactive_clap(subcommand)]
     currency_selection: CurrencySelection,
@@ -18,14 +18,15 @@ pub struct Currency {
 impl Currency {
     pub fn from(
         optional_clap_variant: Option<CliCurrency>,
-        context: crate::common::Context,
+        context: (),
     ) -> color_eyre::eyre::Result<Self> {
-        let currency_selection = match optional_clap_variant.and_then(|clap_variant| clap_variant.currency_selection) {
-            Some(cli_currency_selection) => {
-                CurrencySelection::from(Some(cli_currency_selection), context)?
-            }
-            None => CurrencySelection::choose_variant(context)?,
-        };
+        let currency_selection =
+            match optional_clap_variant.and_then(|clap_variant| clap_variant.currency_selection) {
+                Some(cli_currency_selection) => {
+                    CurrencySelection::from(Some(cli_currency_selection), context)?
+                }
+                None => CurrencySelection::choose_variant(context)?,
+            };
         Ok(Self { currency_selection })
     }
 }
@@ -43,7 +44,7 @@ impl Currency {
 
 #[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = crate::common::Context)]
+#[interactive_clap(context = ())]
 ///What do you want to transfer?
 pub enum CurrencySelection {
     /// The transfer is carried out in NEAR tokens

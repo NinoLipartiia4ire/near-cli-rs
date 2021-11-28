@@ -3,74 +3,66 @@ use interactive_clap::ToCli;
 use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(input_context = super::operation_mode::TransferCommandNetworkContext)]
+#[interactive_clap(output_context = crate::common::SenderContext)]
 pub struct Sender {
     pub sender_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(named_arg)]
     pub send_to: super::receiver::Receiver,
 }
 
+pub struct InteractiveClapContextScopeForSender {
+    sender_account_id: crate::types::account_id::AccountId,
+}
+
+impl crate::common::ToInteractiveClapContextScope for Sender {
+    type InteractiveClapContextScope = InteractiveClapContextScopeForSender;
+}
+
+// #[derive(Clone)]
+// pub struct SenderContext {
+//     pub connection_config: Option<crate::common::ConnectionConfig>,
+//     pub sender_account_id: crate::types::account_id::AccountId,
+// }
+
+impl crate::common::SenderContext {
+    pub fn from_previous_context(
+        previous_context: super::operation_mode::TransferCommandNetworkContext,
+        scope: &<Sender as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+    ) -> Self {
+        Self {
+            connection_config: previous_context.connection_config.clone(),
+            sender_account_id: scope.sender_account_id.clone(),
+        }
+    }
+}
+
 impl Sender {
     pub fn from(
-        // item: CliSender,
         optional_clap_variant: Option<CliSender>,
-        context: crate::common::Context,
+        context: super::operation_mode::TransferCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
-        // let optional_clap_variant = Some(item);
-        let connection_config = context.connection_config.clone();
-        // let sender_account_id: crate::types::account_id::AccountId = match item.sender_account_id {
-        //     Some(cli_sender_account_id) => match &connection_config {
-        //         Some(network_connection_config) => match crate::common::check_account_id(
-        //             network_connection_config.clone(),
-        //             cli_sender_account_id.clone().into(),
-        //         )? {
-        //             Some(_) => cli_sender_account_id,
-        //             None => {
-        //                 println!("Account <{}> doesn't exist", cli_sender_account_id);
-        //                 Sender::input_sender_account_id(connection_config.clone())?
-        //             }
-        //         },
-        //         None => cli_sender_account_id,
-        //     },
-        //     None => Sender::input_sender_account_id(connection_config.clone())?,
-        // };
         let sender_account_id = match optional_clap_variant
             .clone()
             .and_then(|clap_variant| clap_variant.sender_account_id)
         {
-            Some(signer_account_id) => signer_account_id,
-            None => Self::input_sender_account_id(connection_config.clone())?,
+            Some(sender_account_id) => sender_account_id,
+            None => Self::input_sender_account_id(&context)?,
         };
-        let context = crate::common::Context {
-            sender_account_id: Some(sender_account_id.clone().into()),
-            ..context
-        };
-        //-------------------- to do!
-        // let send_to: super::receiver::Receiver = match item.send_to {
-        //     Some(cli_send_to) => {
-        //         let cli_receiver: super::receiver::CliReceiver = super::receiver::CliReceiver {
-        //             receiver_account_id: None,
-        //             transfer: None
-        //         };
-        //         super::receiver::Receiver::from(cli_receiver, context)?
-        //     },
-        //     None => {
-        //         let receiver_account_id = super::receiver::Receiver::input_receiver_account_id(connection_config)?;
-        //         let transfer: super::transfer_near_tokens_type::Transfer = super::transfer_near_tokens_type::Transfer::choose_variant(context)?;
-        //         super::receiver::Receiver {
-        //             receiver_account_id,
-        //             transfer
-        //         }
-        //     },
-        // };
+        type Alias =
+            <Sender as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
+        let new_context_scope = Alias { sender_account_id };
+        let new_context =
+            crate::common::SenderContext::from_previous_context(context, &new_context_scope);
         let send_to = super::receiver::Receiver::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_to {
                 Some(ClapNamedArgReceiverForSender::SendTo(cli_receiver)) => Some(cli_receiver),
                 None => None,
             }),
-            context,
+            new_context,
         )?;
         Ok(Self {
-            sender_account_id,
+            sender_account_id: new_context_scope.sender_account_id,
             send_to,
         })
     }
@@ -78,8 +70,9 @@ impl Sender {
 
 impl Sender {
     fn input_sender_account_id(
-        connection_config: Option<crate::common::ConnectionConfig>,
+        context: &super::operation_mode::TransferCommandNetworkContext,
     ) -> color_eyre::eyre::Result<crate::types::account_id::AccountId> {
+        let connection_config = context.connection_config.clone();
         loop {
             let account_id: crate::types::account_id::AccountId = Input::new()
                 .with_prompt("What is the account ID of the sender?")

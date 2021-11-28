@@ -3,6 +3,7 @@ use interactive_clap::ToCli;
 use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(context = ())]
 pub struct NetworkArgs {
     #[interactive_clap(subcommand)]
     selected_server: self::select_server::SelectServer,
@@ -11,14 +12,15 @@ pub struct NetworkArgs {
 impl NetworkArgs {
     pub fn from(
         optional_clap_variant: Option<CliNetworkArgs>,
-        context: crate::common::Context,
+        context: (),
     ) -> color_eyre::eyre::Result<Self> {
-        let selected_server = match optional_clap_variant.and_then(|clap_variant| clap_variant.selected_server) {
-            Some(cli_selected_server) => {
-                self::select_server::SelectServer::from(Some(cli_selected_server), context)?
-            }
-            None => self::select_server::SelectServer::choose_variant(context)?,
-        };
+        let selected_server =
+            match optional_clap_variant.and_then(|clap_variant| clap_variant.selected_server) {
+                Some(cli_selected_server) => {
+                    self::select_server::SelectServer::from(Some(cli_selected_server), context)?
+                }
+                None => self::select_server::SelectServer::choose_variant(context)?,
+            };
         Ok(Self { selected_server })
     }
 }

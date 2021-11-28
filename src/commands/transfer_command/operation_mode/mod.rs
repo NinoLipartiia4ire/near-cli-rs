@@ -7,6 +7,7 @@ mod offline_mode;
 mod online_mode;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(context = ())]
 pub struct OperationMode {
     #[interactive_clap(subcommand)]
     pub mode: Mode,
@@ -15,7 +16,7 @@ pub struct OperationMode {
 impl OperationMode {
     pub fn from(
         optional_clap_variant: Option<CliOperationMode>,
-        context: crate::common::Context,
+        context: (),
     ) -> color_eyre::eyre::Result<Self> {
         let mode = match optional_clap_variant.and_then(|clap_variant| clap_variant.mode) {
             Some(cli_mode) => Mode::from(Some(cli_mode), context)?,
@@ -36,7 +37,7 @@ impl OperationMode {
 
 #[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = crate::common::Context)]
+#[interactive_clap(context = ())]
 ///To construct a transaction you will need to provide information about sender (signer) and receiver accounts, and actions that needs to be performed.
 ///Do you want to derive some information required for transaction construction automatically querying it online?
 pub enum Mode {
@@ -70,15 +71,14 @@ impl Mode {
     }
 }
 
-pub struct InteractiveClapContextScopeForNetworkContext {
+pub struct InteractiveClapContextScopeForTransferCommandNetworkContext {
     connection_config: Option<crate::common::ConnectionConfig>,
 }
 
-impl crate::common::ToInteractiveClapContextScope for NetworkContext {
-    type InteractiveClapContextScope = InteractiveClapContextScopeForNetworkContext;
+impl crate::common::ToInteractiveClapContextScope for TransferCommandNetworkContext {
+    type InteractiveClapContextScope = InteractiveClapContextScopeForTransferCommandNetworkContext;
 }
 
-pub struct NetworkContext {
+pub struct TransferCommandNetworkContext {
     pub connection_config: Option<crate::common::ConnectionConfig>,
 }
-

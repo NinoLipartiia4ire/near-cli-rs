@@ -21,9 +21,11 @@ impl ToCli for super::Submit {
 impl SignKeychain {
     pub fn from(
         optional_clap_variant: Option<CliSignKeychain>,
-        context: crate::common::Context,
+        context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let submit: Option<super::Submit> = optional_clap_variant.clone().and_then(|clap_variant| clap_variant.submit);
+        let submit: Option<super::Submit> = optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.submit);
         match context.connection_config {
             Some(_) => Ok(Self {
                 nonce: None,
@@ -34,10 +36,8 @@ impl SignKeychain {
                 let home_dir = dirs::home_dir().expect("Impossible to get your home dir!");
                 let file_name = format!(
                     "{}.json",
-                    context
-                        .sender_account_id
-                        .clone()
-                        .expect("wrong sender_account_id")
+                    context.sender_account_id // .clone()
+                                              // .expect("wrong sender_account_id")
                 );
                 let mut path = std::path::PathBuf::from(&home_dir);
                 let dir_name = crate::consts::DIR_NAME_KEY_CHAIN;
@@ -53,14 +53,18 @@ impl SignKeychain {
                     ))
                 })?;
 
-                let nonce: u64 = match optional_clap_variant.clone().and_then(|clap_variant| clap_variant.nonce) {
+                let nonce: u64 = match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.nonce)
+                {
                     Some(cli_nonce) => cli_nonce,
                     None => super::input_access_key_nonce(&account_json.public_key.to_string()),
                 };
-                let block_hash = match optional_clap_variant.and_then(|clap_variant| clap_variant.block_hash) {
-                    Some(cli_block_hash) => cli_block_hash,
-                    None => super::input_block_hash(),
-                };
+                let block_hash =
+                    match optional_clap_variant.and_then(|clap_variant| clap_variant.block_hash) {
+                        Some(cli_block_hash) => cli_block_hash,
+                        None => super::input_block_hash(),
+                    };
                 Ok(SignKeychain {
                     nonce: Some(nonce),
                     block_hash: Some(block_hash),

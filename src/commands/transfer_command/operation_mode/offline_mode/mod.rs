@@ -2,29 +2,50 @@ use interactive_clap::ToCli;
 use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(input_context = (), output_context = super::TransferCommandNetworkContext)]
 pub struct OfflineArgs {
     #[interactive_clap(named_arg)]
     send_from: super::super::sender::Sender,
 }
 
+pub struct InteractiveClapContextScopeForOfflineArgs {}
+
+impl crate::common::ToInteractiveClapContextScope for OfflineArgs {
+    type InteractiveClapContextScope = InteractiveClapContextScopeForOfflineArgs;
+}
+
+struct OfflineArgsContext {}
+
+impl OfflineArgsContext {
+    fn from_previous_context(
+        previous_context: (),
+        scope: <OfflineArgs as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+    ) -> Self {
+        Self {}
+    }
+}
+
+impl From<OfflineArgsContext> for super::TransferCommandNetworkContext {
+    fn from(item: OfflineArgsContext) -> Self {
+        Self {
+            connection_config: None,
+        }
+    }
+}
+
 impl OfflineArgs {
     pub fn from(
         optional_clap_variant: Option<CliOfflineArgs>,
-        context: crate::common::Context,
+        context: (),
     ) -> color_eyre::eyre::Result<Self> {
-        // let optional_clap_variant = Some(item);
-        // let send_from = match item.send_from {
-        //     Some(cli_send_from) => {
-        //         super::online_mode::select_server::server::SendFrom::from(cli_send_from, context)?
-        //     }
-        //     None => super::online_mode::select_server::server::SendFrom::choose_variant(context)?,
-        // };
+        let new_context_scope = InteractiveClapContextScopeForOfflineArgs {};
+        let new_context = OfflineArgsContext::from_previous_context((), new_context_scope).into();
         let send_from = super::super::sender::Sender::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
                 Some(ClapNamedArgSenderForOfflineArgs::SendFrom(cli_sender)) => Some(cli_sender),
                 None => None,
             }),
-            context,
+            new_context,
         )?;
         Ok(Self { send_from })
     }

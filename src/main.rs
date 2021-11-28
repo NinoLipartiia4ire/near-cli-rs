@@ -17,7 +17,7 @@ struct Args {
 
 impl From<CliArgs> for Args {
     fn from(cli_args: CliArgs) -> Self {
-        let context = crate::common::Context::default();
+        let context = ();
         let top_level_command = match cli_args.top_level_command {
             Some(cli_subcommand) => {
                 self::commands::TopLevelCommand::from(Some(cli_subcommand), context).unwrap()
