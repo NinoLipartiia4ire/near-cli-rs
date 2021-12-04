@@ -1322,7 +1322,7 @@ source = "git+https://github.com/FroVolod/interactive-clap#8c544f9fa8b146f4695a3
 [[package]]
 name = "interactive_clap_derive"
 version = "0.1.0"
-source = "git+https://github.com/FroVolod/interactive-clap-derive?rev=96b6bedd4430a31a643d5992971599f9674170c2#96b6bedd4430a31a643d5992971599f9674170c2"
+source = "git+https://github.com/FroVolod/interactive-clap-derive?rev=8f91a4f38fbd5b1ab301a47b49d1838dc47fabf7#8f91a4f38fbd5b1ab301a47b49d1838dc47fabf7"
 dependencies = [
  "clap",
  "clap_generate",

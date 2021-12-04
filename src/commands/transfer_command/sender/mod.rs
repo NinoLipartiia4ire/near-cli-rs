@@ -35,8 +35,7 @@ impl Sender {
             Some(sender_account_id) => sender_account_id,
             None => Self::input_sender_account_id(&context)?,
         };
-        type Alias =
-            <Sender as ToInteractiveClapContextScope>::InteractiveClapContextScope;
+        type Alias = <Sender as ToInteractiveClapContextScope>::InteractiveClapContextScope;
         let new_context_scope = Alias { sender_account_id };
         let new_context =
             crate::common::SenderContext::from_previous_context(context, &new_context_scope);

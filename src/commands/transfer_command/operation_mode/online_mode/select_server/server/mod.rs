@@ -87,8 +87,7 @@ impl CustomServer {
             None => Self::input_url(&context),
         };
         let new_context_scope = InteractiveClapContextScopeForCustomServer { url };
-        let new_context =
-            CustomServerContext::from_previous_context(context, &new_context_scope);
+        let new_context = CustomServerContext::from_previous_context(context, &new_context_scope);
         let send_from = super::super::super::super::sender::Sender::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
                 Some(ClapNamedArgSenderForCustomServer::SendFrom(cli_sender)) => Some(cli_sender),
@@ -102,7 +101,9 @@ impl CustomServer {
         })
     }
 
-    pub fn input_url(_context: &super::SelectServerContext) -> crate::common::AvailableRpcServerUrl {
+    pub fn input_url(
+        _context: &super::SelectServerContext,
+    ) -> crate::common::AvailableRpcServerUrl {
         Input::new()
             .with_prompt("What is the RPC endpoint?")
             .interact_text()
