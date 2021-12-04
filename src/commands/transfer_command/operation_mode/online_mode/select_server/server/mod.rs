@@ -1,5 +1,5 @@
 use dialoguer::Input;
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
@@ -11,14 +11,8 @@ pub struct Server {
     pub send_from: super::super::super::super::sender::Sender,
 }
 
-pub struct InteractiveClapContextScopeForServer {}
-
-impl crate::common::ToInteractiveClapContextScope for Server {
-    type InteractiveClapContextScope = InteractiveClapContextScopeForServer;
-}
-
 #[derive(Debug, Clone, InteractiveClap)]
-#[interactive_clap(input_context = SelectServerContext)]
+#[interactive_clap(input_context = super::SelectServerContext)]
 #[interactive_clap(output_context = super::super::super::TransferCommandNetworkContext)]
 pub struct CustomServer {
     #[interactive_clap(long)]
@@ -31,22 +25,14 @@ impl ToCli for crate::common::AvailableRpcServerUrl {
     type CliVariant = crate::common::AvailableRpcServerUrl;
 }
 
-pub struct InteractiveClapContextScopeForCustomServer {
-    pub url: crate::common::AvailableRpcServerUrl,
-}
-
-impl crate::common::ToInteractiveClapContextScope for CustomServer {
-    type InteractiveClapContextScope = InteractiveClapContextScopeForCustomServer;
-}
-
 struct CustomServerContext {
     pub url: crate::common::AvailableRpcServerUrl,
 }
 
 impl CustomServerContext {
     fn from_previous_context(
-        previous_context: super::SelectServerContext,
-        scope: &<CustomServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+        _previous_context: super::SelectServerContext,
+        scope: &<CustomServer as ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {
             url: scope.url.clone(),
@@ -98,17 +84,17 @@ impl CustomServer {
             .and_then(|clap_variant| clap_variant.url)
         {
             Some(url) => url,
-            None => Self::input_url(),
+            None => Self::input_url(&context),
         };
         let new_context_scope = InteractiveClapContextScopeForCustomServer { url };
         let new_context =
-            CustomServerContext::from_previous_context(context, &new_context_scope).into();
+            CustomServerContext::from_previous_context(context, &new_context_scope);
         let send_from = super::super::super::super::sender::Sender::from(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
                 Some(ClapNamedArgSenderForCustomServer::SendFrom(cli_sender)) => Some(cli_sender),
                 None => None,
             }),
-            new_context,
+            new_context.into(),
         )?;
         Ok(Self {
             url: new_context_scope.url,
@@ -116,7 +102,7 @@ impl CustomServer {
         })
     }
 
-    pub fn input_url() -> crate::common::AvailableRpcServerUrl {
+    pub fn input_url(_context: &super::SelectServerContext) -> crate::common::AvailableRpcServerUrl {
         Input::new()
             .with_prompt("What is the RPC endpoint?")
             .interact_text()

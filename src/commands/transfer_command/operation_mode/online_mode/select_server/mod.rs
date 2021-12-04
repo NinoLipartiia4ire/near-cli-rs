@@ -1,6 +1,6 @@
 use async_recursion::async_recursion;
 use dialoguer::{theme::ColorfulTheme, Select};
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
@@ -26,12 +26,6 @@ pub enum SelectServer {
     Custom(self::server::CustomServer),
 }
 
-pub type InteractiveClapContextScopeForSelectServer = SelectServerDiscriminants;
-
-impl crate::common::ToInteractiveClapContextScope for SelectServer {
-    type InteractiveClapContextScope = InteractiveClapContextScopeForSelectServer;
-}
-
 #[derive(Clone)]
 pub struct SelectServerContext {
     selected_server: SelectServerDiscriminants,
@@ -39,8 +33,8 @@ pub struct SelectServerContext {
 
 impl SelectServerContext {
     fn from_previous_context(
-        previous_context: (),
-        scope: <SelectServer as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+        _previous_context: (),
+        scope: <SelectServer as ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {
             selected_server: scope,

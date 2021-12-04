@@ -1,5 +1,5 @@
 use dialoguer::{theme::ColorfulTheme, Select};
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::{InteractiveClap, ToCliArgs};
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 

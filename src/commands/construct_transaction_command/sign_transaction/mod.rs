@@ -1,5 +1,5 @@
 use dialoguer::{theme::ColorfulTheme, Input, Select};
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::{InteractiveClap, ToCliArgs};
 use near_primitives::borsh::BorshSerialize;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};

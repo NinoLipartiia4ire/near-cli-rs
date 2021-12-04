@@ -1,5 +1,5 @@
 pub mod select_server;
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]

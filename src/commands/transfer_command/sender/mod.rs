@@ -1,5 +1,5 @@
 use dialoguer::Input;
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::InteractiveClap;
 
 #[derive(Debug, Clone, InteractiveClap)]
@@ -11,24 +11,10 @@ pub struct Sender {
     pub send_to: super::receiver::Receiver,
 }
 
-pub struct InteractiveClapContextScopeForSender {
-    sender_account_id: crate::types::account_id::AccountId,
-}
-
-impl crate::common::ToInteractiveClapContextScope for Sender {
-    type InteractiveClapContextScope = InteractiveClapContextScopeForSender;
-}
-
-// #[derive(Clone)]
-// pub struct SenderContext {
-//     pub connection_config: Option<crate::common::ConnectionConfig>,
-//     pub sender_account_id: crate::types::account_id::AccountId,
-// }
-
 impl crate::common::SenderContext {
     pub fn from_previous_context(
         previous_context: super::operation_mode::TransferCommandNetworkContext,
-        scope: &<Sender as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope,
+        scope: &<Sender as ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {
             connection_config: previous_context.connection_config.clone(),
@@ -50,7 +36,7 @@ impl Sender {
             None => Self::input_sender_account_id(&context)?,
         };
         type Alias =
-            <Sender as crate::common::ToInteractiveClapContextScope>::InteractiveClapContextScope;
+            <Sender as ToInteractiveClapContextScope>::InteractiveClapContextScope;
         let new_context_scope = Alias { sender_account_id };
         let new_context =
             crate::common::SenderContext::from_previous_context(context, &new_context_scope);

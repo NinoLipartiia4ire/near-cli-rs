@@ -1,5 +1,5 @@
 use dialoguer::Input;
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 

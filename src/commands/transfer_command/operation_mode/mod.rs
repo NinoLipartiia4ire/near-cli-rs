@@ -1,5 +1,5 @@
 use dialoguer::{theme::ColorfulTheme, Select};
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
@@ -69,14 +69,6 @@ impl Mode {
             }
         }
     }
-}
-
-pub struct InteractiveClapContextScopeForTransferCommandNetworkContext {
-    connection_config: Option<crate::common::ConnectionConfig>,
-}
-
-impl crate::common::ToInteractiveClapContextScope for TransferCommandNetworkContext {
-    type InteractiveClapContextScope = InteractiveClapContextScopeForTransferCommandNetworkContext;
 }
 
 pub struct TransferCommandNetworkContext {

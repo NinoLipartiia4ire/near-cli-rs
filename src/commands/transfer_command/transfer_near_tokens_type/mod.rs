@@ -1,9 +1,9 @@
 use dialoguer::Input;
-use interactive_clap::ToCli;
+use interactive_clap::{ToCli, ToInteractiveClapContextScope};
 use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
 #[interactive_clap(disable_strum_discriminants)]
 pub enum Transfer {
