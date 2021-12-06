@@ -14,19 +14,6 @@ pub struct OperationMode {
 }
 
 impl OperationMode {
-    pub fn from(
-        optional_clap_variant: Option<CliOperationMode>,
-        context: (),
-    ) -> color_eyre::eyre::Result<Self> {
-        let mode = match optional_clap_variant.and_then(|clap_variant| clap_variant.mode) {
-            Some(cli_mode) => Mode::from(Some(cli_mode), context)?,
-            None => Mode::choose_variant(context)?,
-        };
-        Ok(Self { mode })
-    }
-}
-
-impl OperationMode {
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

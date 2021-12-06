@@ -29,6 +29,7 @@ impl Transfer {
 
 #[derive(Debug, Clone, InteractiveClap)]
 #[interactive_clap(context = super::sender::SenderContext)]
+#[interactive_clap(fn_from_cli = default)]
 pub struct TransferNEARTokensAction {
     pub amount: crate::common::NearBalance,
     #[interactive_clap(subcommand)]
@@ -69,10 +70,10 @@ impl TransferNEARTokensAction {
                                 "You need to enter a value of no more than {}",
                                 account_balance
                             );
-                            TransferNEARTokensAction::input_amount(Some(account_balance))
+                            TransferNEARTokensAction::input_amount(Some(account_balance))?
                         }
                     }
-                    None => TransferNEARTokensAction::input_amount(Some(account_balance)),
+                    None => TransferNEARTokensAction::input_amount(Some(account_balance))?,
                 }
             }
             None => match optional_clap_variant
@@ -80,7 +81,7 @@ impl TransferNEARTokensAction {
                 .and_then(|clap_variant| clap_variant.amount)
             {
                 Some(cli_amount) => cli_amount,
-                None => TransferNEARTokensAction::input_amount(None),
+                None => TransferNEARTokensAction::input_amount(None)?,
             },
         };
         let sign_option = match optional_clap_variant.and_then(|clap_variant| clap_variant.sign_option) {
@@ -97,7 +98,7 @@ impl TransferNEARTokensAction {
 impl TransferNEARTokensAction {
     fn input_amount(
         account_balance: Option<crate::common::NearBalance>,
-    ) -> crate::common::NearBalance {
+    ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
         match account_balance {
             Some(account_balance) => loop {
                 let input_amount: crate::common::NearBalance = Input::new()
@@ -106,7 +107,7 @@ impl TransferNEARTokensAction {
                             .interact_text()
                             .unwrap();
                 if input_amount <= account_balance {
-                    break input_amount;
+                    break Ok(input_amount);
                 } else {
                     println!(
                         "You need to enter a value of no more than {}",
@@ -114,10 +115,10 @@ impl TransferNEARTokensAction {
                     )
                 }
             }
-            None => Input::new()
+            None => Ok(Input::new()
                         .with_prompt("How many NEAR Tokens do you want to transfer? (example: 10NEAR or 0.5near or 10000yoctonear)")
                         .interact_text()
-                        .unwrap()
+                        .unwrap())
         }
     }
 

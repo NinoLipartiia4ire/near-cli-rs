@@ -10,22 +10,10 @@ mod types;
 type CliResult = color_eyre::eyre::Result<()>;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(context = ())]
 struct Args {
     #[interactive_clap(subcommand)]
     top_level_command: self::commands::TopLevelCommand,
-}
-
-impl From<CliArgs> for Args {
-    fn from(cli_args: CliArgs) -> Self {
-        let context = ();
-        let top_level_command = match cli_args.top_level_command {
-            Some(cli_subcommand) => {
-                self::commands::TopLevelCommand::from(Some(cli_subcommand), context).unwrap()
-            }
-            None => self::commands::TopLevelCommand::choose_variant(context).unwrap(),
-        };
-        Self { top_level_command }
-    }
 }
 
 impl Args {
@@ -46,7 +34,7 @@ fn main() -> CliResult {
     //     return Ok(());
     // }
 
-    let args = Args::from(cli);
+    let args = Args::from(Some(cli), ())?;
 
     let completed_cli = CliArgs::from(args.clone());
 

@@ -10,22 +10,6 @@ pub struct NetworkArgs {
 }
 
 impl NetworkArgs {
-    pub fn from(
-        optional_clap_variant: Option<CliNetworkArgs>,
-        context: (),
-    ) -> color_eyre::eyre::Result<Self> {
-        let selected_server =
-            match optional_clap_variant.and_then(|clap_variant| clap_variant.selected_server) {
-                Some(cli_selected_server) => {
-                    self::select_server::SelectServer::from(Some(cli_selected_server), context)?
-                }
-                None => self::select_server::SelectServer::choose_variant(context)?,
-            };
-        Ok(Self { selected_server })
-    }
-}
-
-impl NetworkArgs {
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

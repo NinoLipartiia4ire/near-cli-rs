@@ -63,23 +63,23 @@ impl SignTransaction {
     }
 }
 
-fn input_signer_public_key() -> crate::types::public_key::PublicKey {
-    Input::new()
+fn input_signer_public_key() -> color_eyre::eyre::Result<crate::types::public_key::PublicKey> {
+    Ok(Input::new()
         .with_prompt("To create an unsigned transaction enter sender's public key")
         .interact_text()
-        .unwrap()
+        .unwrap())
 }
 
-fn input_signer_private_key() -> near_crypto::SecretKey {
-    Input::new()
+fn input_signer_private_key() -> color_eyre::eyre::Result<near_crypto::SecretKey> {
+    Ok(Input::new()
         .with_prompt("Enter sender's private key")
         .interact_text()
-        .unwrap()
+        .unwrap())
 }
 
-fn input_access_key_nonce(public_key: &str) -> u64 {
+fn input_access_key_nonce(public_key: &str) -> color_eyre::eyre::Result<u64> {
     println!("Your public key: `{}`", public_key);
-    Input::new()
+    Ok(Input::new()
         .with_prompt(
             "Enter transaction nonce for this public key (query the access key information with \
             `./near-cli view nonce \
@@ -88,10 +88,10 @@ fn input_access_key_nonce(public_key: &str) -> u64 {
                 public-key ed25519:...` incremented by 1)",
         )
         .interact_text()
-        .unwrap()
+        .unwrap())
 }
 
-fn input_block_hash() -> crate::types::crypto_hash::CryptoHash {
+fn input_block_hash() -> color_eyre::eyre::Result<crate::types::crypto_hash::CryptoHash> {
     let input_block_hash: crate::common::BlockHashAsBase58 = Input::new()
         .with_prompt(
             "Enter recent block hash (query information about the hash of the last block with \
@@ -99,7 +99,9 @@ fn input_block_hash() -> crate::types::crypto_hash::CryptoHash {
         )
         .interact_text()
         .unwrap();
-    crate::types::crypto_hash::CryptoHash(input_block_hash.inner)
+    Ok(crate::types::crypto_hash::CryptoHash(
+        input_block_hash.inner,
+    ))
 }
 
 #[derive(Debug, EnumDiscriminants, Clone, clap::Clap, ToCliArgs)]

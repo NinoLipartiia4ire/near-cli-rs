@@ -5,6 +5,7 @@ use interactive_clap_derive::InteractiveClap;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(fn_from_cli = default)]
 pub struct SignKeychain {
     #[interactive_clap(long)]
     nonce: Option<u64>,
@@ -58,12 +59,12 @@ impl SignKeychain {
                     .and_then(|clap_variant| clap_variant.nonce)
                 {
                     Some(cli_nonce) => cli_nonce,
-                    None => super::input_access_key_nonce(&account_json.public_key.to_string()),
+                    None => super::input_access_key_nonce(&account_json.public_key.to_string())?,
                 };
                 let block_hash =
                     match optional_clap_variant.and_then(|clap_variant| clap_variant.block_hash) {
                         Some(cli_block_hash) => cli_block_hash,
-                        None => super::input_block_hash(),
+                        None => super::input_block_hash()?,
                     };
                 Ok(SignKeychain {
                     nonce: Some(nonce),

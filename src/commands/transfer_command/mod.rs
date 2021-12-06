@@ -16,22 +16,6 @@ pub struct Currency {
 }
 
 impl Currency {
-    pub fn from(
-        optional_clap_variant: Option<CliCurrency>,
-        context: (),
-    ) -> color_eyre::eyre::Result<Self> {
-        let currency_selection =
-            match optional_clap_variant.and_then(|clap_variant| clap_variant.currency_selection) {
-                Some(cli_currency_selection) => {
-                    CurrencySelection::from(Some(cli_currency_selection), context)?
-                }
-                None => CurrencySelection::choose_variant(context)?,
-            };
-        Ok(Self { currency_selection })
-    }
-}
-
-impl Currency {
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

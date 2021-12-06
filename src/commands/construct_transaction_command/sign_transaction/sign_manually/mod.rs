@@ -3,6 +3,7 @@ use interactive_clap_derive::InteractiveClap;
 use near_primitives::borsh::BorshSerialize;
 
 #[derive(Debug, Clone, InteractiveClap)]
+#[interactive_clap(fn_from_cli = default)]
 pub struct SignManually {
     #[interactive_clap(long)]
     pub signer_public_key: crate::types::public_key::PublicKey,
@@ -24,31 +25,31 @@ impl SignManually {
     pub fn from(
         item: CliSignManually,
         connection_config: Option<crate::common::ConnectionConfig>,
-    ) -> Self {
+    ) -> color_eyre::eyre::Result<Self> {
         let signer_public_key: crate::types::public_key::PublicKey = match item.signer_public_key {
             Some(cli_public_key) => cli_public_key,
-            None => super::input_signer_public_key(),
+            None => super::input_signer_public_key()?,
         };
         match connection_config {
-            Some(_) => Self {
+            Some(_) => Ok(Self {
                 signer_public_key,
                 nonce: None,
                 block_hash: None,
-            },
+            }),
             None => {
                 let nonce: u64 = match item.nonce {
                     Some(cli_nonce) => cli_nonce,
-                    None => super::input_access_key_nonce(&signer_public_key.to_string()),
+                    None => super::input_access_key_nonce(&signer_public_key.to_string())?,
                 };
                 let block_hash = match item.block_hash {
                     Some(cli_block_hash) => cli_block_hash,
-                    None => super::input_block_hash(),
+                    None => super::input_block_hash()?,
                 };
-                Self {
+                Ok(Self {
                     signer_public_key,
                     nonce: Some(nonce),
                     block_hash: Some(block_hash),
-                }
+                })
             }
         }
     }

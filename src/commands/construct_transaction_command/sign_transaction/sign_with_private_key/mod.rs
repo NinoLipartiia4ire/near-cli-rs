@@ -78,49 +78,49 @@ impl SignPrivateKey {
     pub fn from(
         item: CliSignPrivateKey,
         connection_config: Option<crate::common::ConnectionConfig>,
-    ) -> Self {
+    ) -> color_eyre::eyre::Result<Self> {
         let signer_public_key: crate::types::public_key::PublicKey = match item.signer_public_key {
             Some(cli_public_key) => cli_public_key,
-            None => super::input_signer_public_key(),
+            None => super::input_signer_public_key()?,
         };
         let signer_private_key: near_crypto::SecretKey = match item.signer_private_key {
             Some(signer_private_key) => signer_private_key,
-            None => super::input_signer_private_key(),
+            None => super::input_signer_private_key()?,
         };
         let submit: Option<super::Submit> = item.submit;
         match connection_config {
-            Some(_) => Self {
+            Some(_) => Ok(Self {
                 signer_public_key,
                 signer_private_key,
                 nonce: None,
                 block_hash: None,
                 submit,
-            },
+            }),
             None => {
                 let nonce: u64 = match item.nonce {
                     Some(cli_nonce) => cli_nonce,
-                    None => super::input_access_key_nonce(&signer_public_key.to_string()),
+                    None => super::input_access_key_nonce(&signer_public_key.to_string())?,
                 };
                 let block_hash = match item.block_hash {
                     Some(cli_block_hash) => cli_block_hash,
-                    None => super::input_block_hash(),
+                    None => super::input_block_hash()?,
                 };
                 let public_key_origin: near_crypto::PublicKey =
                     near_crypto::SecretKey::public_key(&signer_private_key);
                 if &signer_public_key.0 == &public_key_origin {
-                    Self {
+                    Ok(Self {
                         signer_public_key,
                         signer_private_key,
                         nonce: Some(nonce),
                         block_hash: Some(block_hash),
                         submit,
-                    }
+                    })
                 } else {
                     println!("\nError: The key pair does not match. Re-enter the keys.\n");
                     let signer_public_key: crate::types::public_key::PublicKey =
-                        super::input_signer_public_key();
+                        super::input_signer_public_key()?;
                     let signer_secret_key: near_crypto::SecretKey =
-                        super::input_signer_private_key();
+                        super::input_signer_private_key()?;
                     Self::from(
                         CliSignPrivateKey {
                             signer_public_key: Some(signer_public_key),

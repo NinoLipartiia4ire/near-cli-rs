@@ -34,10 +34,10 @@ pub struct SelectServerContext {
 impl SelectServerContext {
     fn from_previous_context(
         _previous_context: (),
-        scope: <SelectServer as ToInteractiveClapContextScope>::InteractiveClapContextScope,
+        scope: &<SelectServer as ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {
-            selected_server: scope,
+            selected_server: scope.clone(),
         }
     }
 }

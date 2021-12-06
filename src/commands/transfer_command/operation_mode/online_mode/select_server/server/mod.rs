@@ -18,6 +18,7 @@ pub struct CustomServer {
     #[interactive_clap(long)]
     pub url: crate::common::AvailableRpcServerUrl,
     #[interactive_clap(named_arg)]
+    ///Specify a sender
     pub send_from: super::super::super::super::sender::Sender,
 }
 
@@ -49,20 +50,6 @@ impl From<CustomServerContext> for super::super::super::TransferCommandNetworkCo
 }
 
 impl Server {
-    pub fn from(
-        optional_clap_variant: Option<CliServer>,
-        context: super::SelectServerContext,
-    ) -> color_eyre::eyre::Result<Self> {
-        let send_from = super::super::super::super::sender::Sender::from(
-            optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
-                Some(ClapNamedArgSenderForServer::SendFrom(cli_sender)) => Some(cli_sender),
-                None => None,
-            }),
-            context.into(),
-        )?;
-        Ok(Self { send_from })
-    }
-
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,
@@ -75,39 +62,13 @@ impl Server {
 }
 
 impl CustomServer {
-    pub fn from(
-        optional_clap_variant: Option<CliCustomServer>,
-        context: super::SelectServerContext,
-    ) -> color_eyre::eyre::Result<Self> {
-        let url: crate::common::AvailableRpcServerUrl = match optional_clap_variant
-            .clone()
-            .and_then(|clap_variant| clap_variant.url)
-        {
-            Some(url) => url,
-            None => Self::input_url(&context),
-        };
-        let new_context_scope = InteractiveClapContextScopeForCustomServer { url };
-        let new_context = CustomServerContext::from_previous_context(context, &new_context_scope);
-        let send_from = super::super::super::super::sender::Sender::from(
-            optional_clap_variant.and_then(|clap_variant| match clap_variant.send_from {
-                Some(ClapNamedArgSenderForCustomServer::SendFrom(cli_sender)) => Some(cli_sender),
-                None => None,
-            }),
-            new_context.into(),
-        )?;
-        Ok(Self {
-            url: new_context_scope.url,
-            send_from,
-        })
-    }
-
     pub fn input_url(
         _context: &super::SelectServerContext,
-    ) -> crate::common::AvailableRpcServerUrl {
-        Input::new()
+    ) -> color_eyre::eyre::Result<crate::common::AvailableRpcServerUrl> {
+        Ok(Input::new()
             .with_prompt("What is the RPC endpoint?")
             .interact_text()
-            .unwrap()
+            .unwrap())
     }
 
     pub async fn process(

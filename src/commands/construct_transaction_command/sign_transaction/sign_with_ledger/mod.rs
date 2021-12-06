@@ -100,11 +100,11 @@ impl SignLedger {
             None => {
                 let nonce: u64 = match item.nonce {
                     Some(cli_nonce) => cli_nonce,
-                    None => super::input_access_key_nonce(&signer_public_key.to_string().clone()),
+                    None => super::input_access_key_nonce(&signer_public_key.to_string().clone())?,
                 };
                 let block_hash = match item.block_hash {
                     Some(cli_block_hash) => cli_block_hash,
-                    None => super::input_block_hash(),
+                    None => super::input_block_hash()?,
                 };
                 Ok(Self {
                     seed_phrase_hd_path,
