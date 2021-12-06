@@ -5,6 +5,7 @@ use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
 #[derive(Debug, Clone, InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
+#[interactive_clap(fn_from_cli = default)]
 pub struct Receiver {
     pub receiver_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(subcommand)]
@@ -13,6 +14,43 @@ pub struct Receiver {
 
 impl ToCli for crate::types::account_id::AccountId {
     type CliVariant = crate::types::account_id::AccountId;
+}
+
+impl Receiver {
+    pub fn from(
+        optional_clap_variant: Option<CliReceiver>,
+        context: crate::common::SenderContext,
+    ) -> color_eyre::eyre::Result<Self> {
+        let connection_config = context.connection_config.clone();
+        let receiver_account_id = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.receiver_account_id)
+        {
+            Some(receiver_account_id) => match &connection_config {
+                Some(network_connection_config) => match crate::common::check_account_id(
+                    network_connection_config.clone(),
+                    receiver_account_id.clone().into(),
+                )? {
+                    Some(_) => receiver_account_id,
+                    None => {
+                        println!("Account <{}> doesn't exist", receiver_account_id);
+                        Self::input_receiver_account_id(&context)?
+                    }
+                },
+                None => receiver_account_id,
+            },
+            None => Self::input_receiver_account_id(&context)?,
+        };
+        let transfer = super::transfer_near_tokens_type::Transfer::from(
+            optional_clap_variant.and_then(|clap_variant| clap_variant.transfer),
+            context,
+        )?;
+
+        Ok(Self {
+            receiver_account_id,
+            transfer,
+        })
+    }
 }
 
 impl Receiver {

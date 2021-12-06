@@ -6,6 +6,7 @@ use interactive_clap_derive::InteractiveClap;
 #[derive(Debug, Clone, InteractiveClap)]
 #[interactive_clap(input_context = super::operation_mode::TransferCommandNetworkContext)]
 #[interactive_clap(output_context = crate::common::SenderContext)]
+#[interactive_clap(fn_from_cli = default)]
 pub struct Sender {
     pub sender_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(named_arg)]
@@ -21,6 +22,49 @@ impl crate::common::SenderContext {
             connection_config: previous_context.connection_config.clone(),
             sender_account_id: scope.sender_account_id.clone(),
         }
+    }
+}
+
+impl Sender {
+    pub fn from(
+        optional_clap_variant: Option<CliSender>,
+        context: super::operation_mode::TransferCommandNetworkContext,
+    ) -> color_eyre::eyre::Result<Self> {
+        let connection_config = context.connection_config.clone();
+        let sender_account_id = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.sender_account_id)
+        {
+            Some(sender_account_id) => match &connection_config {
+                Some(network_connection_config) => match crate::common::check_account_id(
+                    network_connection_config.clone(),
+                    sender_account_id.clone().into(),
+                )? {
+                    Some(_) => sender_account_id,
+                    None => {
+                        println!("Account <{}> doesn't exist", sender_account_id);
+                        Sender::input_sender_account_id(&context)?
+                    }
+                },
+                None => sender_account_id,
+            },
+            None => Self::input_sender_account_id(&context)?,
+        };
+        type Alias = <Sender as ToInteractiveClapContextScope>::InteractiveClapContextScope;
+        let new_context_scope = Alias { sender_account_id };
+        let new_context =
+            crate::common::SenderContext::from_previous_context(context, &new_context_scope);
+        let send_to = super::receiver::Receiver::from(
+            optional_clap_variant.and_then(|clap_variant| match clap_variant.send_to {
+                Some(ClapNamedArgReceiverForSender::SendTo(cli_receiver)) => Some(cli_receiver),
+                None => None,
+            }),
+            new_context,
+        )?;
+        Ok(Self {
+            sender_account_id: new_context_scope.sender_account_id,
+            send_to,
+        })
     }
 }
 
