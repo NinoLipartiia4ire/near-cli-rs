@@ -15,7 +15,7 @@ impl From<std::path::PathBuf> for PathBuf {
 
 impl std::fmt::Display for PathBuf {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.0)
+        write!(f, "{}", self.0.display())
     }
 }
 
