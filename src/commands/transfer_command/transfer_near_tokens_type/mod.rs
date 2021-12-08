@@ -28,7 +28,7 @@ impl Transfer {
 }
 
 #[derive(Debug, Clone, InteractiveClap)]
-#[interactive_clap(context = super::sender::SenderContext)]
+#[interactive_clap(context = crate::common::SenderContext)]
 #[interactive_clap(fn_from_cli = default)]
 pub struct TransferNEARTokensAction {
     pub amount: crate::common::NearBalance,

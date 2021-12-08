@@ -10,6 +10,7 @@ use interactive_clap_derive::InteractiveClap;
 pub struct Sender {
     pub sender_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(named_arg)]
+    ///Specify a receiver
     pub send_to: super::receiver::Receiver,
 }
 
