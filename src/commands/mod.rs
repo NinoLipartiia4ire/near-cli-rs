@@ -1,7 +1,4 @@
-use dialoguer::{theme::ColorfulTheme, Select};
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
-use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
+use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 pub mod add_command;
 pub mod construct_transaction_command;
@@ -13,7 +10,7 @@ pub mod transfer_command;
 pub mod utils_command;
 // pub mod view_command;
 
-#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 #[interactive_clap(context = ())]
 ///Choose transaction action
@@ -36,8 +33,9 @@ pub enum TopLevelCommand {
     Add(self::add_command::AddAction),
     // #[strum_discriminants(strum(message = "Delete access key, account"))]
     // Delete(self::delete_command::DeleteAction),
-    // #[strum_discriminants(strum(message = "Construct a new transaction"))]
-    // ConstructTransaction(self::construct_transaction_command::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "Construct a new transaction"))]
+    ///Use these to construct transaction
+    ConstructTransaction(self::construct_transaction_command::operation_mode::OperationMode),
     // #[strum_discriminants(strum(message = "Helpers"))]
     // Utils(self::utils_command::Utils),
 }
@@ -54,7 +52,7 @@ impl TopLevelCommand {
         };
         match self {
             Self::Add(add_action) => add_action.process(unsigned_transaction).await,
-            // Self::ConstructTransaction(mode) => mode.process(unsigned_transaction).await,
+            Self::ConstructTransaction(mode) => mode.process(unsigned_transaction).await,
             // Self::Delete(delete_action) => delete_action.process(unsigned_transaction).await,
             // Self::Execute(option_method) => option_method.process(unsigned_transaction).await,
             // Self::Login(mode) => mode.process().await,

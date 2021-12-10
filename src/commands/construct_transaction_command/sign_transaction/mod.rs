@@ -1,6 +1,4 @@
 use dialoguer::{theme::ColorfulTheme, Input, Select};
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::{InteractiveClap, ToCliArgs};
 use near_primitives::borsh::BorshSerialize;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
@@ -9,7 +7,7 @@ pub mod sign_with_keychain;
 pub mod sign_with_ledger;
 pub mod sign_with_private_key;
 
-#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 #[interactive_clap(context = crate::common::SenderContext)]
 ///Would you like to sign the transaction?
@@ -104,7 +102,7 @@ fn input_block_hash() -> color_eyre::eyre::Result<crate::types::crypto_hash::Cry
     ))
 }
 
-#[derive(Debug, EnumDiscriminants, Clone, clap::Clap, ToCliArgs)]
+#[derive(Debug, EnumDiscriminants, Clone, clap::Clap, interactive_clap_derive::ToCliArgs)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 pub enum Submit {
     #[strum_discriminants(strum(

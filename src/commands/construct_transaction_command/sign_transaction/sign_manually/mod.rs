@@ -1,8 +1,6 @@
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
 use near_primitives::borsh::BorshSerialize;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(fn_from_cli = default)]
 pub struct SignManually {
     #[interactive_clap(long)]
@@ -13,11 +11,11 @@ pub struct SignManually {
     block_hash: Option<crate::types::crypto_hash::CryptoHash>,
 }
 
-impl ToCli for crate::types::public_key::PublicKey {
+impl interactive_clap::ToCli for crate::types::public_key::PublicKey {
     type CliVariant = crate::types::public_key::PublicKey;
 }
 
-impl ToCli for crate::types::crypto_hash::CryptoHash {
+impl interactive_clap::ToCli for crate::types::crypto_hash::CryptoHash {
     type CliVariant = crate::types::crypto_hash::CryptoHash;
 }
 

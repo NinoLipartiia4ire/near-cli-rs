@@ -20,6 +20,10 @@ pub struct TransferNEARTokensAction {
     pub next_action: Box<super::NextAction>,
 }
 
+impl interactive_clap::ToCli for TransferNEARTokensAction {
+    type CliVariant = CliTransferNEARTokensAction;
+}
+
 impl CliTransferNEARTokensAction {
     pub fn to_cli_args(&self) -> std::collections::VecDeque<String> {
         let mut args = self
@@ -47,23 +51,25 @@ impl From<TransferNEARTokensAction> for CliTransferNEARTokensAction {
 
 impl TransferNEARTokensAction {
     pub fn from(
-        item: CliTransferNEARTokensAction,
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        optional_clap_variant: Option<CliTransferNEARTokensAction>,
+        context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let amount: crate::common::NearBalance = match &connection_config {
+        let amount: crate::common::NearBalance = match context.connection_config.clone() {
             Some(network_connection_config) => {
                 let account_balance: crate::common::NearBalance =
                     match crate::common::check_account_id(
                         network_connection_config.clone(),
-                        sender_account_id.clone(),
+                        context.clone().sender_account_id.into(),
                     )? {
                         Some(account_view) => {
                             crate::common::NearBalance::from_yoctonear(account_view.amount)
                         }
                         None => crate::common::NearBalance::from_yoctonear(0),
                     };
-                match item.amount {
+                match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.amount)
+                {
                     Some(cli_amount) => {
                         if cli_amount <= account_balance {
                             cli_amount
@@ -72,25 +78,27 @@ impl TransferNEARTokensAction {
                                 "You need to enter a value of no more than {}",
                                 account_balance
                             );
-                            TransferNEARTokensAction::input_amount(Some(account_balance))
+                            TransferNEARTokensAction::input_amount(Some(account_balance))?
                         }
                     }
-                    None => TransferNEARTokensAction::input_amount(Some(account_balance)),
+                    None => TransferNEARTokensAction::input_amount(Some(account_balance))?,
                 }
             }
-            None => match item.amount {
+            None => match optional_clap_variant
+                .clone()
+                .and_then(|clap_variant| clap_variant.amount)
+            {
                 Some(cli_amount) => cli_amount,
-                None => TransferNEARTokensAction::input_amount(None),
+                None => TransferNEARTokensAction::input_amount(None)?,
             },
         };
-        let skip_next_action: super::NextAction = match item.next_action {
-            Some(cli_skip_action) => super::NextAction::from_cli_skip_next_action(
-                cli_skip_action,
-                connection_config,
-                sender_account_id,
-            )?,
-            None => super::NextAction::input_next_action(connection_config, sender_account_id)?,
-        };
+        let skip_next_action: super::NextAction =
+            match optional_clap_variant.and_then(|clap_variant| clap_variant.next_action) {
+                Some(cli_skip_action) => {
+                    super::NextAction::from_cli_skip_next_action(cli_skip_action, context)?
+                }
+                None => super::NextAction::choose_variant(context)?,
+            };
         Ok(Self {
             amount,
             next_action: Box::new(skip_next_action),
@@ -101,7 +109,7 @@ impl TransferNEARTokensAction {
 impl TransferNEARTokensAction {
     fn input_amount(
         account_balance: Option<crate::common::NearBalance>,
-    ) -> crate::common::NearBalance {
+    ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
         match account_balance {
             Some(account_balance) => loop {
                 let input_amount: crate::common::NearBalance = Input::new()
@@ -110,7 +118,7 @@ impl TransferNEARTokensAction {
                             .interact_text()
                             .unwrap();
                 if input_amount <= account_balance {
-                    break input_amount;
+                    break Ok(input_amount);
                 } else {
                     println!(
                         "You need to enter a value of no more than {}",
@@ -118,10 +126,10 @@ impl TransferNEARTokensAction {
                     )
                 }
             }
-            None => Input::new()
+            None => Ok(Input::new()
                         .with_prompt("How many NEAR Tokens do you want to transfer? (example: 10NEAR or 0.5near or 10000yoctonear)")
                         .interact_text()
-                        .unwrap()
+                        .unwrap())
         }
     }
 

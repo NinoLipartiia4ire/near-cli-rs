@@ -1,10 +1,8 @@
 extern crate dirs;
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
 
 use serde::Deserialize;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(fn_from_cli = default)]
 pub struct SignKeychain {
     #[interactive_clap(long)]
@@ -15,7 +13,7 @@ pub struct SignKeychain {
     pub submit: Option<super::Submit>,
 }
 
-impl ToCli for super::Submit {
+impl interactive_clap::ToCli for super::Submit {
     type CliVariant = super::Submit;
 }
 
