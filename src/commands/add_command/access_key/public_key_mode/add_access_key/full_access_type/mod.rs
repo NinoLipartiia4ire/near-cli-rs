@@ -1,67 +1,9 @@
-/// данные для определения ключа с полным доступом
-#[derive(Debug, Default, Clone, clap::Clap)]
-#[clap(
-    setting(clap::AppSettings::ColoredHelp),
-    setting(clap::AppSettings::DisableHelpSubcommand),
-    setting(clap::AppSettings::VersionlessSubcommands)
-)]
-pub struct CliFullAccessType {
-    #[clap(subcommand)]
-    sign_option: Option<
-        crate::commands::construct_transaction_command::sign_transaction::CliSignTransaction,
-    >,
-}
-
-#[derive(Debug, Clone)]
-// #[interactive_clap(context = super::super::super::sender::SenderContext)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
+#[interactive_clap(context = crate::common::SenderContext)]
 pub struct FullAccessType {
+    #[interactive_clap(subcommand)]
     pub sign_option:
         crate::commands::construct_transaction_command::sign_transaction::SignTransaction,
-}
-
-impl CliFullAccessType {
-    pub fn to_cli_args(&self) -> std::collections::VecDeque<String> {
-        self.sign_option
-            .as_ref()
-            .map(|subcommand| subcommand.to_cli_args())
-            .unwrap_or_default()
-    }
-}
-
-impl From<FullAccessType> for CliFullAccessType {
-    fn from(full_access_type: FullAccessType) -> Self {
-        Self {
-            sign_option: Some(full_access_type.sign_option.into()),
-        }
-    }
-}
-
-// --- Временная имплементация
-impl From<super::super::super::sender::SenderContext> for crate::common::Context {
-    fn from(item: super::super::super::sender::SenderContext) -> Self {
-        Self {
-            connection_config: item.connection_config,
-            sender_account_id: Some(item.sender_account_id),
-        }
-    }
-}
-// ---------------------------
-
-impl FullAccessType {
-    pub fn from(
-        item: CliFullAccessType,
-        context: super::super::super::sender::SenderContext,
-        // connection_config: Option<crate::common::ConnectionConfig>,
-        // sender_account_id: near_primitives::types::AccountId,
-    ) -> color_eyre::eyre::Result<Self> {
-        // let sender_account_id = context.sender_account_id;
-        let common_context = crate::common::Context::from(context); // Временно
-        let sign_option = match item.sign_option {
-            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), common_context)?,
-            None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(common_context)?,
-        };
-        Ok(Self { sign_option })
-    }
 }
 
 impl FullAccessType {

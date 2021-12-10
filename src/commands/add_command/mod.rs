@@ -1,6 +1,6 @@
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
-// mod access_key;
+mod access_key;
 mod contract_code;
 // mod implicit_account;
 // mod stake_proposal;
@@ -27,8 +27,9 @@ impl AddAction {
 #[interactive_clap(context = ())]
 /// What do you want to add?
 pub enum Action {
-    // #[strum_discriminants(strum(message = "Add a new access key for an account"))]
-    // AccessKey(self::access_key::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "Add a new access key for an account"))]
+    ///Add a new access key for an account
+    AccessKey(self::access_key::operation_mode::OperationMode),
     #[strum_discriminants(strum(message = "Add a new contract code"))]
     ///Add contract code
     ContractCode(self::contract_code::operation_mode::OperationMode),
@@ -46,11 +47,11 @@ impl Action {
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,
     ) -> crate::CliResult {
         match self {
-            // Action::AccessKey(operation_mode) => {
-            //     operation_mode
-            //         .process(prepopulated_unsigned_transaction)
-            //         .await
-            // }
+            Action::AccessKey(operation_mode) => {
+                operation_mode
+                    .process(prepopulated_unsigned_transaction)
+                    .await
+            }
             Action::ContractCode(operation_mode) => {
                 operation_mode
                     .process(prepopulated_unsigned_transaction)

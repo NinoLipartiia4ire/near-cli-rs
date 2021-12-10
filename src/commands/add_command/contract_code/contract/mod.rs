@@ -4,7 +4,6 @@ mod initialize_mode;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
-// #[interactive_clap(fn_from_cli = default)]
 pub struct ContractFile {
     pub file_path: crate::types::path_buf::PathBuf,
     #[interactive_clap(subcommand)]

@@ -5,7 +5,7 @@ use dialoguer::Input;
 pub struct Server {
     #[interactive_clap(named_arg)]
     ///Specify a sender
-    pub send_from: super::super::super::super::sender::Sender,
+    pub account: super::super::super::super::sender::Sender,
 }
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
@@ -16,7 +16,7 @@ pub struct CustomServer {
     pub url: crate::common::AvailableRpcServerUrl,
     #[interactive_clap(named_arg)]
     ///Specify a sender
-    pub send_from: super::super::super::super::sender::Sender,
+    pub account: super::super::super::super::sender::Sender,
 }
 
 struct CustomServerContext {
@@ -48,7 +48,7 @@ impl Server {
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,
         connection_config: crate::common::ConnectionConfig,
     ) -> crate::CliResult {
-        self.send_from
+        self.account
             .process(prepopulated_unsigned_transaction, Some(connection_config))
             .await
     }
@@ -69,7 +69,7 @@ impl CustomServer {
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,
     ) -> crate::CliResult {
         let connection_config = Some(crate::common::ConnectionConfig::from_custom_url(&self.url));
-        self.send_from
+        self.account
             .process(prepopulated_unsigned_transaction, connection_config)
             .await
     }

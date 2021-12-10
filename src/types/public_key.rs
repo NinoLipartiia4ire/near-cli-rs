@@ -15,3 +15,9 @@ impl std::str::FromStr for PublicKey {
         Ok(Self(public_key))
     }
 }
+
+impl From<PublicKey> for near_crypto::PublicKey {
+    fn from(item: PublicKey) -> Self {
+        item.0
+    }
+}

@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 #[derive(Debug, Default, Clone)]
 pub struct CryptoHash(pub near_primitives::hash::CryptoHash);
 
@@ -9,7 +7,7 @@ impl std::fmt::Display for CryptoHash {
     }
 }
 
-impl FromStr for CryptoHash {
+impl std::str::FromStr for CryptoHash {
     type Err = Box<dyn std::error::Error>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

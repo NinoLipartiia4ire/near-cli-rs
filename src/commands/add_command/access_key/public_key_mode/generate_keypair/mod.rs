@@ -1,66 +1,10 @@
 use std::str::FromStr;
 
-/// Generate a key pair of private and public keys (use it anywhere you need
-/// Ed25519 keys)
-#[derive(Debug, Default, Clone, clap::Clap)]
-#[clap(
-    setting(clap::AppSettings::ColoredHelp),
-    setting(clap::AppSettings::DisableHelpSubcommand),
-    setting(clap::AppSettings::VersionlessSubcommands)
-)]
-pub struct CliGenerateKeypair {
-    #[clap(subcommand)]
-    permission: Option<super::add_access_key::CliAccessKeyPermission>,
-}
-
-#[derive(Debug, Clone)]
-// #[interactive_clap(context = super::super::sender::SenderContext)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
+#[interactive_clap(context = crate::common::SenderContext)]
 pub struct GenerateKeypair {
+    #[interactive_clap(subcommand)]
     pub permission: super::add_access_key::AccessKeyPermission,
-}
-
-impl CliGenerateKeypair {
-    pub fn to_cli_args(&self) -> std::collections::VecDeque<String> {
-        let args = self
-            .permission
-            .as_ref()
-            .map(|subcommand| subcommand.to_cli_args())
-            .unwrap_or_default();
-        args
-    }
-}
-
-impl From<GenerateKeypair> for CliGenerateKeypair {
-    fn from(generate_keypair: GenerateKeypair) -> Self {
-        Self {
-            permission: Some(generate_keypair.permission.into()),
-        }
-    }
-}
-
-impl GenerateKeypair {
-    pub fn from(
-        optional_clap_variant: Option<CliGenerateKeypair>,
-        context: super::super::sender::SenderContext,
-        // connection_config: Option<crate::common::ConnectionConfig>,
-        // sender_account_id: near_primitives::types::AccountId,
-    ) -> color_eyre::eyre::Result<Self> {
-        let permission: super::add_access_key::AccessKeyPermission =
-            match optional_clap_variant.and_then(|clap_variant| clap_variant.permission) {
-                Some(cli_permission) => super::add_access_key::AccessKeyPermission::from(
-                    cli_permission,
-                    context,
-                    // connection_config,
-                    // sender_account_id,
-                )?,
-                None => super::add_access_key::AccessKeyPermission::choose_permission(
-                    context,
-                    // connection_config,
-                    // sender_account_id,
-                )?,
-            };
-        Ok(Self { permission })
-    }
 }
 
 impl GenerateKeypair {
