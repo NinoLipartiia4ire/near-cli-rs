@@ -1,8 +1,6 @@
 pub mod select_server;
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = ())]
 pub struct NetworkArgs {
     #[interactive_clap(subcommand)]

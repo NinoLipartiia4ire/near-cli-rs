@@ -1,10 +1,8 @@
-use interactive_clap::ToCli;
-use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 mod call_function_type;
 
-#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 #[interactive_clap(context = crate::common::SenderContext)]
 pub enum NextAction {
@@ -37,7 +35,7 @@ impl NextAction {
     }
 }
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
 pub struct NoInitialize {
     #[interactive_clap(subcommand)]

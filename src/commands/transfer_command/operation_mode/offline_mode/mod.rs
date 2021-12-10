@@ -1,7 +1,4 @@
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
-
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(input_context = ())]
 #[interactive_clap(output_context = OfflineArgsContext)]
 pub struct OfflineArgs {
@@ -14,7 +11,7 @@ struct OfflineArgsContext {}
 impl OfflineArgsContext {
     fn from_previous_context(
         _previous_context: (),
-        _scope: &<OfflineArgs as ToInteractiveClapContextScope>::InteractiveClapContextScope,
+        _scope: &<OfflineArgs as interactive_clap::ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {}
     }

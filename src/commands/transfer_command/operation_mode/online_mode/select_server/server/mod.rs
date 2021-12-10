@@ -1,9 +1,6 @@
 use dialoguer::Input;
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
-use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = super::SelectServerContext)]
 pub struct Server {
     #[interactive_clap(named_arg)]
@@ -11,7 +8,7 @@ pub struct Server {
     pub send_from: super::super::super::super::sender::Sender,
 }
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(input_context = super::SelectServerContext)]
 #[interactive_clap(output_context = super::super::super::TransferCommandNetworkContext)]
 pub struct CustomServer {
@@ -22,7 +19,7 @@ pub struct CustomServer {
     pub send_from: super::super::super::super::sender::Sender,
 }
 
-impl ToCli for crate::common::AvailableRpcServerUrl {
+impl interactive_clap::ToCli for crate::common::AvailableRpcServerUrl {
     type CliVariant = crate::common::AvailableRpcServerUrl;
 }
 
@@ -33,7 +30,7 @@ struct CustomServerContext {
 impl CustomServerContext {
     fn from_previous_context(
         _previous_context: super::SelectServerContext,
-        scope: &<CustomServer as ToInteractiveClapContextScope>::InteractiveClapContextScope,
+        scope: &<CustomServer as interactive_clap::ToInteractiveClapContextScope>::InteractiveClapContextScope,
     ) -> Self {
         Self {
             url: scope.url.clone(),

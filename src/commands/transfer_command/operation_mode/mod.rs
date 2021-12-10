@@ -1,12 +1,9 @@
-use dialoguer::{theme::ColorfulTheme, Select};
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
-use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
+use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 mod offline_mode;
 mod online_mode;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = ())]
 pub struct OperationMode {
     #[interactive_clap(subcommand)]
@@ -22,7 +19,7 @@ impl OperationMode {
     }
 }
 
-#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 #[interactive_clap(context = ())]
 ///To construct a transaction you will need to provide information about sender (signer) and receiver accounts, and actions that needs to be performed.

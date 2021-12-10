@@ -1,14 +1,11 @@
-use dialoguer::{theme::ColorfulTheme, Select};
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
-use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
+use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 pub mod operation_mode;
 mod receiver;
 mod sender;
 pub mod transfer_near_tokens_type;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = ())]
 pub struct Currency {
     #[interactive_clap(subcommand)]
@@ -26,7 +23,7 @@ impl Currency {
     }
 }
 
-#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 #[interactive_clap(context = ())]
 ///What do you want to transfer?

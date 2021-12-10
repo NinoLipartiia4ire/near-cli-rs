@@ -1,5 +1,3 @@
-use interactive_clap::ToCli;
-use interactive_clap_derive::InteractiveClap;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 // mod access_key;
@@ -8,7 +6,7 @@ mod contract_code;
 // mod stake_proposal;
 // mod sub_account;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = ())]
 pub struct AddAction {
     #[interactive_clap(subcommand)]
@@ -24,7 +22,7 @@ impl AddAction {
     }
 }
 
-#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
 #[interactive_clap(context = ())]
 /// What do you want to add?

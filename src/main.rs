@@ -1,7 +1,5 @@
 use clap::Clap;
 extern crate shell_words;
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
 mod commands;
 mod common;
 mod consts;
@@ -9,7 +7,7 @@ mod types;
 
 type CliResult = color_eyre::eyre::Result<()>;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = ())]
 struct Args {
     #[interactive_clap(subcommand)]

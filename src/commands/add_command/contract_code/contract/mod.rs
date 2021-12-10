@@ -1,10 +1,8 @@
 use dialoguer::Input;
-use interactive_clap::ToCli;
-use interactive_clap_derive::InteractiveClap;
 
 mod initialize_mode;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
 // #[interactive_clap(fn_from_cli = default)]
 pub struct ContractFile {
@@ -13,7 +11,7 @@ pub struct ContractFile {
     next_action: self::initialize_mode::NextAction,
 }
 
-impl ToCli for crate::types::path_buf::PathBuf {
+impl interactive_clap::ToCli for crate::types::path_buf::PathBuf {
     type CliVariant = crate::types::path_buf::PathBuf;
 }
 

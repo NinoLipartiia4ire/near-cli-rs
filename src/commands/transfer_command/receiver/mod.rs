@@ -1,9 +1,6 @@
 use dialoguer::Input;
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
-use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
 #[interactive_clap(fn_from_cli = default)]
 pub struct Receiver {
@@ -12,7 +9,7 @@ pub struct Receiver {
     pub transfer: super::transfer_near_tokens_type::Transfer,
 }
 
-impl ToCli for crate::types::account_id::AccountId {
+impl interactive_clap::ToCli for crate::types::account_id::AccountId {
     type CliVariant = crate::types::account_id::AccountId;
 }
 

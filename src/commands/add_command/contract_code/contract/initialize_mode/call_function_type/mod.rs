@@ -1,8 +1,6 @@
 use dialoguer::Input;
-use interactive_clap::ToCli;
-use interactive_clap_derive::InteractiveClap;
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
 pub struct CallFunctionAction {
     method_name: String,

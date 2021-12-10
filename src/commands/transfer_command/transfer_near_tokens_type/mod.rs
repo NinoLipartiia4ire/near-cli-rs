@@ -1,9 +1,7 @@
 use dialoguer::Input;
-use interactive_clap::{ToCli, ToInteractiveClapContextScope};
-use interactive_clap_derive::InteractiveClap;
-use strum::{EnumDiscriminants, EnumIter, EnumMessage, IntoEnumIterator};
+use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, EnumDiscriminants, InteractiveClap)]
+#[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
 #[interactive_clap(disable_strum_discriminants)]
 pub enum Transfer {
@@ -27,7 +25,7 @@ impl Transfer {
     }
 }
 
-#[derive(Debug, Clone, InteractiveClap)]
+#[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SenderContext)]
 #[interactive_clap(fn_from_cli = default)]
 pub struct TransferNEARTokensAction {
@@ -37,13 +35,15 @@ pub struct TransferNEARTokensAction {
         crate::commands::construct_transaction_command::sign_transaction::SignTransaction,
 }
 
-impl ToCli for crate::common::NearBalance {
+impl interactive_clap::ToCli for crate::common::NearBalance {
     type CliVariant = crate::common::NearBalance;
 }
 
 impl TransferNEARTokensAction {
     fn from(
-        optional_clap_variant: Option<<TransferNEARTokensAction as ToCli>::CliVariant>,
+        optional_clap_variant: Option<
+            <TransferNEARTokensAction as interactive_clap::ToCli>::CliVariant,
+        >,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
         let amount: crate::common::NearBalance = match context.connection_config.clone() {
