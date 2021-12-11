@@ -29,7 +29,7 @@ pub enum TopLevelCommand {
     #[strum_discriminants(strum(
         message = "Add access key, contract code, stake proposal, sub-account, implicit-account"
     ))]
-    ///Use these to add action
+    ///Use these to add access key, contract code, stake proposal, sub-account, implicit-account
     Add(self::add_command::AddAction),
     // #[strum_discriminants(strum(message = "Delete access key, account"))]
     // Delete(self::delete_command::DeleteAction),

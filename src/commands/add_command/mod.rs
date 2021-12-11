@@ -2,7 +2,7 @@ use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 mod access_key;
 mod contract_code;
-// mod implicit_account;
+mod implicit_account;
 // mod stake_proposal;
 // mod sub_account;
 
@@ -31,10 +31,11 @@ pub enum Action {
     ///Add a new access key for an account
     AccessKey(self::access_key::operation_mode::OperationMode),
     #[strum_discriminants(strum(message = "Add a new contract code"))]
-    ///Add contract code
+    ///Add a contract code
     ContractCode(self::contract_code::operation_mode::OperationMode),
-    // #[strum_discriminants(strum(message = "Add an implicit-account"))]
-    // ImplicitAccount(self::implicit_account::ImplicitAccount),
+    #[strum_discriminants(strum(message = "Add an implicit-account"))]
+    ///Add implicit account
+    ImplicitAccount(self::implicit_account::ImplicitAccount),
     // #[strum_discriminants(strum(message = "Add a new stake proposal"))]
     // StakeProposal(self::stake_proposal::operation_mode::OperationMode),
     // #[strum_discriminants(strum(message = "Add a new sub-account"))]
@@ -56,17 +57,18 @@ impl Action {
                 operation_mode
                     .process(prepopulated_unsigned_transaction)
                     .await
-            } // Action::ImplicitAccount(generate_keypair) => generate_keypair.process().await,
-              // Action::StakeProposal(operation_mode) => {
-              //     operation_mode
-              //         .process(prepopulated_unsigned_transaction)
-              //         .await
-              // }
-              // Action::SubAccount(operation_mode) => {
-              //     operation_mode
-              //         .process(prepopulated_unsigned_transaction)
-              //         .await
-              // }
+            }
+            Action::ImplicitAccount(generate_keypair) => generate_keypair.process().await,
+            // Action::StakeProposal(operation_mode) => {
+            //     operation_mode
+            //         .process(prepopulated_unsigned_transaction)
+            //         .await
+            // }
+            // Action::SubAccount(operation_mode) => {
+            //     operation_mode
+            //         .process(prepopulated_unsigned_transaction)
+            //         .await
+            // }
         }
     }
 }
