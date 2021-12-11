@@ -4,7 +4,7 @@ mod access_key;
 mod contract_code;
 mod implicit_account;
 mod stake_proposal;
-// mod sub_account;
+mod sub_account;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = ())]
@@ -39,8 +39,9 @@ pub enum Action {
     #[strum_discriminants(strum(message = "Add a new stake proposal"))]
     ///Add a stake proposal
     StakeProposal(self::stake_proposal::operation_mode::OperationMode),
-    // #[strum_discriminants(strum(message = "Add a new sub-account"))]
-    // SubAccount(self::sub_account::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "Add a new sub-account"))]
+    ///Add a new sub-account
+    SubAccount(self::sub_account::operation_mode::OperationMode),
 }
 
 impl Action {
@@ -64,11 +65,12 @@ impl Action {
                 operation_mode
                     .process(prepopulated_unsigned_transaction)
                     .await
-            } // Action::SubAccount(operation_mode) => {
-              //     operation_mode
-              //         .process(prepopulated_unsigned_transaction)
-              //         .await
-              // }
+            }
+            Action::SubAccount(operation_mode) => {
+                operation_mode
+                    .process(prepopulated_unsigned_transaction)
+                    .await
+            }
         }
     }
 }
