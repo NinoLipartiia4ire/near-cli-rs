@@ -97,7 +97,7 @@ impl Sender {
         network_connection_config: Option<crate::common::ConnectionConfig>,
     ) -> crate::CliResult {
         let unsigned_transaction = near_primitives::transaction::Transaction {
-            signer_id: self.sender_account_id.0.clone(),
+            signer_id: self.sender_account_id.clone().into(),
             ..prepopulated_unsigned_transaction
         };
         self.send_to
