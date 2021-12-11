@@ -3,7 +3,7 @@ use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 mod access_key;
 mod contract_code;
 mod implicit_account;
-// mod stake_proposal;
+mod stake_proposal;
 // mod sub_account;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
@@ -36,8 +36,9 @@ pub enum Action {
     #[strum_discriminants(strum(message = "Add an implicit-account"))]
     ///Add implicit account
     ImplicitAccount(self::implicit_account::ImplicitAccount),
-    // #[strum_discriminants(strum(message = "Add a new stake proposal"))]
-    // StakeProposal(self::stake_proposal::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "Add a new stake proposal"))]
+    ///Add a stake proposal
+    StakeProposal(self::stake_proposal::operation_mode::OperationMode),
     // #[strum_discriminants(strum(message = "Add a new sub-account"))]
     // SubAccount(self::sub_account::operation_mode::OperationMode),
 }
@@ -59,16 +60,15 @@ impl Action {
                     .await
             }
             Action::ImplicitAccount(generate_keypair) => generate_keypair.process().await,
-            // Action::StakeProposal(operation_mode) => {
-            //     operation_mode
-            //         .process(prepopulated_unsigned_transaction)
-            //         .await
-            // }
-            // Action::SubAccount(operation_mode) => {
-            //     operation_mode
-            //         .process(prepopulated_unsigned_transaction)
-            //         .await
-            // }
+            Action::StakeProposal(operation_mode) => {
+                operation_mode
+                    .process(prepopulated_unsigned_transaction)
+                    .await
+            } // Action::SubAccount(operation_mode) => {
+              //     operation_mode
+              //         .process(prepopulated_unsigned_transaction)
+              //         .await
+              // }
         }
     }
 }
