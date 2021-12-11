@@ -3,7 +3,7 @@
 #[interactive_clap(output_context = OfflineArgsContext)]
 pub struct OfflineArgs {
     #[interactive_clap(named_arg)]
-    send_from: super::super::sender::Sender,
+    account: super::super::sender::Sender,
 }
 
 struct OfflineArgsContext {}
@@ -31,7 +31,7 @@ impl OfflineArgs {
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,
     ) -> crate::CliResult {
         let selected_server_url = None;
-        self.send_from
+        self.account
             .process(prepopulated_unsigned_transaction, selected_server_url)
             .await
     }
