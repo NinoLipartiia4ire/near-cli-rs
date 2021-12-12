@@ -1,7 +1,7 @@
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 mod access_key;
-// mod account;
+mod account;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = ())]
@@ -27,9 +27,9 @@ pub enum Action {
     #[strum_discriminants(strum(message = "Delete an access key for this account"))]
     /// Delete an access key for an account
     AccessKey(self::access_key::operation_mode::OperationMode),
-    // #[strum_discriminants(strum(message = "Delete this account"))]
-    // /// Delete this account
-    // Account(self::account::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "Delete this account"))]
+    /// Delete this account
+    Account(self::account::operation_mode::OperationMode),
 }
 
 impl Action {
@@ -42,11 +42,12 @@ impl Action {
                 operation_mode
                     .process(prepopulated_unsigned_transaction)
                     .await
-            } // Action::Account(operation_mode) => {
-              //     operation_mode
-              //         .process(prepopulated_unsigned_transaction)
-              //         .await
-              // }
+            }
+            Action::Account(operation_mode) => {
+                operation_mode
+                    .process(prepopulated_unsigned_transaction)
+                    .await
+            }
         }
     }
 }
