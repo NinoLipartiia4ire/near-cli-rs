@@ -22,6 +22,10 @@ pub struct StakeNEARTokensAction {
     pub next_action: Box<super::NextAction>,
 }
 
+impl interactive_clap::ToCli for StakeNEARTokensAction {
+    type CliVariant = CliStakeNEARTokensAction;
+}
+
 impl CliStakeNEARTokensAction {
     pub fn to_cli_args(&self) -> std::collections::VecDeque<String> {
         let mut args = self
@@ -53,23 +57,25 @@ impl From<StakeNEARTokensAction> for CliStakeNEARTokensAction {
 
 impl StakeNEARTokensAction {
     pub fn from(
-        item: CliStakeNEARTokensAction,
-        connection_config: Option<crate::common::ConnectionConfig>,
-        sender_account_id: near_primitives::types::AccountId,
+        optional_clap_variant: Option<CliStakeNEARTokensAction>,
+        context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let stake: crate::common::NearBalance = match &connection_config {
+        let stake: crate::common::NearBalance = match context.connection_config.clone() {
             Some(network_connection_config) => {
                 let account_balance: crate::common::NearBalance =
                     match crate::common::check_account_id(
                         network_connection_config.clone(),
-                        sender_account_id.clone(),
+                        context.sender_account_id.clone().into(),
                     )? {
                         Some(account_view) => {
                             crate::common::NearBalance::from_yoctonear(account_view.amount)
                         }
                         None => crate::common::NearBalance::from_yoctonear(0),
                     };
-                match item.stake {
+                match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.stake)
+                {
                     Some(cli_stake) => {
                         if cli_stake <= account_balance {
                             cli_stake
@@ -78,29 +84,34 @@ impl StakeNEARTokensAction {
                                 "You need to enter a value of no more than {}",
                                 account_balance
                             );
-                            StakeNEARTokensAction::input_stake(Some(account_balance))
+                            StakeNEARTokensAction::input_stake(&context, Some(account_balance))?
                         }
                     }
-                    None => StakeNEARTokensAction::input_stake(Some(account_balance)),
+                    None => StakeNEARTokensAction::input_stake(&context, Some(account_balance))?,
                 }
             }
-            None => match item.stake {
+            None => match optional_clap_variant
+                .clone()
+                .and_then(|clap_variant| clap_variant.stake)
+            {
                 Some(cli_amount) => cli_amount,
-                None => StakeNEARTokensAction::input_stake(None),
+                None => StakeNEARTokensAction::input_stake(&context, None)?,
             },
         };
-        let public_key: near_crypto::PublicKey = match item.public_key {
+        let public_key: near_crypto::PublicKey = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.public_key)
+        {
             Some(cli_public_key) => cli_public_key,
-            None => StakeNEARTokensAction::input_public_key(),
+            None => StakeNEARTokensAction::input_public_key(&context)?,
         };
-        let skip_next_action: super::NextAction = match item.next_action {
-            Some(cli_skip_action) => super::NextAction::from_cli_skip_next_action(
-                cli_skip_action,
-                connection_config,
-                sender_account_id,
-            )?,
-            None => super::NextAction::input_next_action(connection_config, sender_account_id)?,
-        };
+        let skip_next_action: super::NextAction =
+            match optional_clap_variant.and_then(|clap_variant| clap_variant.next_action) {
+                Some(cli_skip_action) => {
+                    super::NextAction::from_cli_skip_next_action(cli_skip_action, context)?
+                }
+                None => super::NextAction::choose_variant(context)?,
+            };
         Ok(Self {
             stake,
             public_key,
@@ -110,16 +121,19 @@ impl StakeNEARTokensAction {
 }
 
 impl StakeNEARTokensAction {
-    fn input_public_key() -> near_crypto::PublicKey {
-        Input::new()
+    fn input_public_key(
+        _context: &crate::common::SenderContext,
+    ) -> color_eyre::eyre::Result<near_crypto::PublicKey> {
+        Ok(Input::new()
             .with_prompt("Enter a public key for this stake")
             .interact_text()
-            .unwrap()
+            .unwrap())
     }
 
     fn input_stake(
+        _context: &crate::common::SenderContext,
         account_balance: Option<crate::common::NearBalance>,
-    ) -> crate::common::NearBalance {
+    ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
         match account_balance {
             Some(account_balance) => loop {
                 let input_stake: crate::common::NearBalance = Input::new()
@@ -128,7 +142,7 @@ impl StakeNEARTokensAction {
                             .interact_text()
                             .unwrap();
                 if input_stake <= account_balance {
-                    break input_stake;
+                    break Ok(input_stake);
                 } else {
                     println!(
                         "You need to enter a value of no more than {}",
@@ -136,10 +150,10 @@ impl StakeNEARTokensAction {
                     )
                 }
             }
-            None => Input::new()
+            None => Ok(Input::new()
                         .with_prompt("How many NEAR Tokens do you want to stake? (example: 10NEAR or 0.5near or 10000yoctonear)")
                         .interact_text()
-                        .unwrap()
+                        .unwrap())
         }
     }
 

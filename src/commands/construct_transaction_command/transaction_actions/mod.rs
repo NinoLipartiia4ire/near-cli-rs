@@ -2,11 +2,11 @@ use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 mod add_access_key_mode;
 mod add_contract_code_type;
-// mod call_function_type;
-// mod create_account_type;
-// mod delete_access_key_type;
-// mod delete_account_type;
-// mod stake_near_tokens_type;
+mod call_function_type;
+mod create_account_type;
+mod delete_access_key_type;
+mod delete_account_type;
+mod stake_near_tokens_type;
 mod transfer_near_tokens_type;
 
 #[derive(Debug, Clone, clap::Clap)]
@@ -123,24 +123,24 @@ pub enum ActionSubcommand {
     #[strum_discriminants(strum(message = "Transfer NEAR Tokens"))]
     /// Предоставьте данные для перевода Near
     TransferNearTokens(self::transfer_near_tokens_type::TransferNEARTokensAction),
-    // #[strum_discriminants(strum(message = "Call a Function"))]
-    // /// Предоставьте данные для call function
-    // CallFunction(self::call_function_type::CallFunctionAction),
-    // #[strum_discriminants(strum(message = "Stake NEAR Tokens"))]
-    // /// Предоставьте данные для ставки
-    // StakeNEARTokens(self::stake_near_tokens_type::StakeNEARTokensAction),
-    // #[strum_discriminants(strum(message = "Create an Account"))]
-    // /// Предоставьте данные для создания аккаунта
-    // CreateAccount(self::create_account_type::CreateAccountAction),
-    // #[strum_discriminants(strum(message = "Delete an Account"))]
-    // /// Предоставьте данные для удаления аккаунта
-    // DeleteAccount(self::delete_account_type::DeleteAccountAction),
+    #[strum_discriminants(strum(message = "Call a Function"))]
+    /// Предоставьте данные для call function
+    CallFunction(self::call_function_type::CallFunctionAction),
+    #[strum_discriminants(strum(message = "Stake NEAR Tokens"))]
+    /// Предоставьте данные для ставки
+    StakeNearTokens(self::stake_near_tokens_type::StakeNEARTokensAction),
+    #[strum_discriminants(strum(message = "Create an Account"))]
+    /// Предоставьте данные для создания аккаунта
+    CreateAccount(self::create_account_type::CreateAccountAction),
+    #[strum_discriminants(strum(message = "Delete an Account"))]
+    /// Предоставьте данные для удаления аккаунта
+    DeleteAccount(self::delete_account_type::DeleteAccountAction),
     #[strum_discriminants(strum(message = "Add an Access Key"))]
     /// Предоставьте данные для добавления ключа доступа пользователю
     AddAccessKey(self::add_access_key_mode::AddAccessKeyMode),
-    // #[strum_discriminants(strum(message = "Detete an Access Key"))]
-    // /// Предоставьте данные для удаления ключа доступа у пользователя
-    // DeleteAccessKey(self::delete_access_key_type::DeleteAccessKeyAction),
+    #[strum_discriminants(strum(message = "Detete an Access Key"))]
+    /// Предоставьте данные для удаления ключа доступа у пользователя
+    DeleteAccessKey(self::delete_access_key_type::DeleteAccessKeyAction),
     #[strum_discriminants(strum(message = "Add a contract code"))]
     /// Предоставьте данные для добавления контракта
     AddContractCode(self::add_contract_code_type::ContractFile),
@@ -157,35 +157,37 @@ impl ActionSubcommand {
                 args_transfer
                     .process(prepopulated_unsigned_transaction, network_connection_config)
                     .await
-            } // ActionSubcommand::CallFunction(args_function) => {
-            //     args_function
-            //         .process(prepopulated_unsigned_transaction, network_connection_config)
-            //         .await
-            // }
-            // ActionSubcommand::StakeNEARTokens(args_stake) => {
-            //     args_stake
-            //         .process(prepopulated_unsigned_transaction, network_connection_config)
-            //         .await
-            // }
-            // ActionSubcommand::CreateAccount(args_create_account) => {
-            //     args_create_account
-            //         .process(prepopulated_unsigned_transaction, network_connection_config)
-            //         .await
-            // }
-            // ActionSubcommand::DeleteAccount(args_delete_account) => {
-            //     args_delete_account
-            //         .process(prepopulated_unsigned_transaction, network_connection_config)
-            //         .await
-            // }
+            }
+            ActionSubcommand::CallFunction(args_function) => {
+                args_function
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
+            ActionSubcommand::StakeNearTokens(args_stake) => {
+                args_stake
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
+            ActionSubcommand::CreateAccount(args_create_account) => {
+                args_create_account
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
+            ActionSubcommand::DeleteAccount(args_delete_account) => {
+                args_delete_account
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
             ActionSubcommand::AddAccessKey(args_add_access_key) => {
                 args_add_access_key
                     .process(prepopulated_unsigned_transaction, network_connection_config)
                     .await
-            } // ActionSubcommand::DeleteAccessKey(args_delete_access_key) => {
-            //     args_delete_access_key
-            //         .process(prepopulated_unsigned_transaction, network_connection_config)
-            //         .await
-            // }
+            }
+            ActionSubcommand::DeleteAccessKey(args_delete_access_key) => {
+                args_delete_access_key
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
             ActionSubcommand::AddContractCode(args_contract_file) => {
                 args_contract_file
                     .process(prepopulated_unsigned_transaction, network_connection_config)
