@@ -1,6 +1,6 @@
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
-// mod add_access_key_mode;
+mod add_access_key_mode;
 // mod add_contract_code_type;
 // mod call_function_type;
 // mod create_account_type;
@@ -135,9 +135,9 @@ pub enum ActionSubcommand {
     // #[strum_discriminants(strum(message = "Delete an Account"))]
     // /// Предоставьте данные для удаления аккаунта
     // DeleteAccount(self::delete_account_type::DeleteAccountAction),
-    // #[strum_discriminants(strum(message = "Add an Access Key"))]
-    // /// Предоставьте данные для добавления ключа доступа пользователю
-    // AddAccessKey(self::add_access_key_mode::AddAccessKeyMode),
+    #[strum_discriminants(strum(message = "Add an Access Key"))]
+    /// Предоставьте данные для добавления ключа доступа пользователю
+    AddAccessKey(self::add_access_key_mode::AddAccessKeyMode),
     // #[strum_discriminants(strum(message = "Detete an Access Key"))]
     // /// Предоставьте данные для удаления ключа доступа у пользователя
     // DeleteAccessKey(self::delete_access_key_type::DeleteAccessKeyAction),
@@ -158,31 +158,30 @@ impl ActionSubcommand {
                     .process(prepopulated_unsigned_transaction, network_connection_config)
                     .await
             } // ActionSubcommand::CallFunction(args_function) => {
-              //     args_function
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
-              // ActionSubcommand::StakeNEARTokens(args_stake) => {
-              //     args_stake
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
-              // ActionSubcommand::CreateAccount(args_create_account) => {
-              //     args_create_account
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
-              // ActionSubcommand::DeleteAccount(args_delete_account) => {
-              //     args_delete_account
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
-              // ActionSubcommand::AddAccessKey(args_add_access_key) => {
-              //     args_add_access_key
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
-              // ActionSubcommand::DeleteAccessKey(args_delete_access_key) => {
+            //     args_function
+            //         .process(prepopulated_unsigned_transaction, network_connection_config)
+            //         .await
+            // }
+            // ActionSubcommand::StakeNEARTokens(args_stake) => {
+            //     args_stake
+            //         .process(prepopulated_unsigned_transaction, network_connection_config)
+            //         .await
+            // }
+            // ActionSubcommand::CreateAccount(args_create_account) => {
+            //     args_create_account
+            //         .process(prepopulated_unsigned_transaction, network_connection_config)
+            //         .await
+            // }
+            // ActionSubcommand::DeleteAccount(args_delete_account) => {
+            //     args_delete_account
+            //         .process(prepopulated_unsigned_transaction, network_connection_config)
+            //         .await
+            // }
+            ActionSubcommand::AddAccessKey(args_add_access_key) => {
+                args_add_access_key
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            } // ActionSubcommand::DeleteAccessKey(args_delete_access_key) => {
               //     args_delete_access_key
               //         .process(prepopulated_unsigned_transaction, network_connection_config)
               //         .await
