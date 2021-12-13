@@ -1,7 +1,7 @@
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 mod add_access_key_mode;
-// mod add_contract_code_type;
+mod add_contract_code_type;
 // mod call_function_type;
 // mod create_account_type;
 // mod delete_access_key_type;
@@ -141,9 +141,9 @@ pub enum ActionSubcommand {
     // #[strum_discriminants(strum(message = "Detete an Access Key"))]
     // /// Предоставьте данные для удаления ключа доступа у пользователя
     // DeleteAccessKey(self::delete_access_key_type::DeleteAccessKeyAction),
-    // #[strum_discriminants(strum(message = "Add a contract code"))]
-    // /// Предоставьте данные для добавления контракта
-    // AddContractCode(self::add_contract_code_type::ContractFile),
+    #[strum_discriminants(strum(message = "Add a contract code"))]
+    /// Предоставьте данные для добавления контракта
+    AddContractCode(self::add_contract_code_type::ContractFile),
 }
 
 impl ActionSubcommand {
@@ -182,15 +182,15 @@ impl ActionSubcommand {
                     .process(prepopulated_unsigned_transaction, network_connection_config)
                     .await
             } // ActionSubcommand::DeleteAccessKey(args_delete_access_key) => {
-              //     args_delete_access_key
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
-              // ActionSubcommand::AddContractCode(args_contract_file) => {
-              //     args_contract_file
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
+            //     args_delete_access_key
+            //         .process(prepopulated_unsigned_transaction, network_connection_config)
+            //         .await
+            // }
+            ActionSubcommand::AddContractCode(args_contract_file) => {
+                args_contract_file
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
         }
     }
 }
