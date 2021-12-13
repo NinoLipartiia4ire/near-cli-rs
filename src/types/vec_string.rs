@@ -19,3 +19,9 @@ impl std::str::FromStr for VecString {
         Ok(Self(vec_str))
     }
 }
+
+impl From<VecString> for Vec<String> {
+    fn from(item: VecString) -> Self {
+        item.0
+    }
+}

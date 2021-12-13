@@ -147,7 +147,7 @@ impl FunctionCallType {
         let connection_config = context.connection_config.clone();
         loop {
             let account_id: crate::types::account_id::AccountId = Input::new()
-                .with_prompt("What is the account ID of the receiver?")
+                .with_prompt("Enter a receiver to use by this access key to pay for function call gas and transaction fees.")
                 .interact_text()
                 .unwrap();
             if let Some(connection_config) = &connection_config {
@@ -187,7 +187,7 @@ impl FunctionCallType {
                         }
                     },
                     receiver_id: self.receiver_account_id.to_string().clone(),
-                    method_names: self.method_names.0.clone(),
+                    method_names: self.method_names.clone().into(),
                 },
             ),
         };
