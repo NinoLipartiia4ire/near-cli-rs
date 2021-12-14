@@ -5,8 +5,10 @@ use dialoguer::Input;
 pub struct CallFunctionAction {
     method_name: String,
     args: String,
-    gas: near_primitives::types::Gas,
-    deposit: near_primitives::types::Balance,
+    #[interactive_clap(long = "prepaid-gas")]
+    gas: crate::common::NearGas,
+    #[interactive_clap(long = "attached-deposit")]
+    deposit: crate::common::NearBalance,
     #[interactive_clap(subcommand)]
     pub sign_option:
         crate::commands::construct_transaction_command::sign_transaction::SignTransaction,
@@ -25,7 +27,7 @@ impl CallFunctionAction {
 
     fn input_gas(
         _context: &crate::common::SenderContext,
-    ) -> color_eyre::eyre::Result<near_primitives::types::Gas> {
+    ) -> color_eyre::eyre::Result<crate::common::NearGas> {
         println!();
         let gas: u64 = loop {
             let input_gas: crate::common::NearGas = Input::new()
@@ -36,13 +38,13 @@ impl CallFunctionAction {
             let gas: u64 = match input_gas {
                 crate::common::NearGas { inner: num } => num,
             };
-            if gas <= 200000000000000 {
+            if gas <= 300000000000000 {
                 break gas;
             } else {
                 println!("You need to enter a value of no more than 200 TERAGAS")
             }
         };
-        Ok(gas)
+        Ok(gas.into())
     }
 
     fn input_args(_context: &crate::common::SenderContext) -> color_eyre::eyre::Result<String> {
@@ -55,7 +57,7 @@ impl CallFunctionAction {
 
     fn input_deposit(
         _context: &crate::common::SenderContext,
-    ) -> color_eyre::eyre::Result<near_primitives::types::Balance> {
+    ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
         println!();
         let deposit: crate::common::NearBalance = Input::new()
             .with_prompt(
@@ -64,7 +66,7 @@ impl CallFunctionAction {
             .with_initial_text("0 NEAR")
             .interact_text()
             .unwrap();
-        Ok(deposit.to_yoctonear())
+        Ok(deposit)
     }
 
     pub async fn process(
@@ -76,8 +78,8 @@ impl CallFunctionAction {
             near_primitives::transaction::FunctionCallAction {
                 method_name: self.method_name.clone(),
                 args: self.args.clone().into_bytes(),
-                gas: self.gas.clone(),
-                deposit: self.deposit.clone(),
+                gas: self.gas.clone().inner,
+                deposit: self.deposit.clone().to_yoctonear(),
             },
         );
         let mut actions = prepopulated_unsigned_transaction.actions.clone();

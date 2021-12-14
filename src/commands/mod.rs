@@ -3,7 +3,7 @@ use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 pub mod add_command;
 pub mod construct_transaction_command;
 pub mod delete_command;
-// pub mod execute_command;
+pub mod execute_command;
 // pub mod generate_shell_completions_command;
 // pub mod login;
 pub mod transfer_command;
@@ -24,8 +24,9 @@ pub enum TopLevelCommand {
     #[strum_discriminants(strum(message = "Transfer tokens"))]
     ///Use these to transfer tokens
     Transfer(self::transfer_command::Currency),
-    // #[strum_discriminants(strum(message = "Execute function (contract method)"))]
-    // Execute(self::execute_command::OptionMethod),
+    #[strum_discriminants(strum(message = "Execute function (contract method)"))]
+    ///Execute function (contract method)
+    Execute(self::execute_command::OptionMethod),
     #[strum_discriminants(strum(
         message = "Add access key, contract code, stake proposal, sub-account, implicit-account"
     ))]
@@ -55,7 +56,7 @@ impl TopLevelCommand {
             Self::Add(add_action) => add_action.process(unsigned_transaction).await,
             Self::ConstructTransaction(mode) => mode.process(unsigned_transaction).await,
             Self::Delete(delete_action) => delete_action.process(unsigned_transaction).await,
-            // Self::Execute(option_method) => option_method.process(unsigned_transaction).await,
+            Self::Execute(option_method) => option_method.process(unsigned_transaction).await,
             // Self::Login(mode) => mode.process().await,
             Self::Transfer(currency) => currency.process(unsigned_transaction).await,
             // Self::Utils(util_type) => util_type.process().await,

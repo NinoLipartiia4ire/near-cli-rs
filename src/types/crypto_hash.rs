@@ -1,6 +1,12 @@
 #[derive(Debug, Default, Clone)]
 pub struct CryptoHash(pub near_primitives::hash::CryptoHash);
 
+impl From<CryptoHash> for near_primitives::hash::CryptoHash {
+    fn from(item: CryptoHash) -> Self {
+        item.0
+    }
+}
+
 impl std::fmt::Display for CryptoHash {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         self.0.fmt(f)
