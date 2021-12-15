@@ -22,7 +22,6 @@ impl Utils {
     }
 }
 
-
 #[derive(Debug, Clone, clap::Clap)]
 pub enum CliUtil {
     /// It generates a random key pair
@@ -148,7 +147,9 @@ impl Util {
         context: (),
     ) -> color_eyre::eyre::Result<Self> {
         match optional_clap_variant {
-            Some(CliUtil::GenerateKeypair(generate_keypair)) => Ok(Util::GenerateKeypair(generate_keypair)),
+            Some(CliUtil::GenerateKeypair(generate_keypair)) => {
+                Ok(Util::GenerateKeypair(generate_keypair))
+            }
             Some(CliUtil::SignTransactionPrivateKey(cli_sign_transaction)) => {
                 let sign_transaction =
                     self::sign_transaction_subcommand_with_secret_key::SignTransactionPrivateKey::from(cli_sign_transaction);
@@ -173,11 +174,13 @@ impl Util {
                     );
                 Ok(Util::ViewSerializedTransaction(view_serialized_transaction))
             }
-            Some(CliUtil::LedgerPublicKey(ledger_publickey)) => Ok(Util::LedgerPublicKey(ledger_publickey)),
+            Some(CliUtil::LedgerPublicKey(ledger_publickey)) => {
+                Ok(Util::LedgerPublicKey(ledger_publickey))
+            }
             Some(CliUtil::SendSignedTransaction(cli_operation_mode)) => {
                 Ok(Util::SendSignedTransaction(cli_operation_mode.into()))
             }
-            None => Self::choose_variant(context)
+            None => Self::choose_variant(context),
         }
     }
 }
