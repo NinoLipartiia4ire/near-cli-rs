@@ -4,7 +4,7 @@ pub mod add_command;
 pub mod construct_transaction_command;
 pub mod delete_command;
 pub mod execute_command;
-// pub mod generate_shell_completions_command;
+pub mod generate_shell_completions_command;
 // pub mod login;
 pub mod transfer_command;
 pub mod utils_command;
@@ -38,8 +38,9 @@ pub enum TopLevelCommand {
     #[strum_discriminants(strum(message = "Construct a new transaction"))]
     ///Use these to construct transaction
     ConstructTransaction(self::construct_transaction_command::operation_mode::OperationMode),
-    // #[strum_discriminants(strum(message = "Helpers"))]
-    // Utils(self::utils_command::Utils),
+    #[strum_discriminants(strum(message = "Helpers"))]
+    ///Helpers
+    Utils(self::utils_command::Utils),
 }
 
 impl TopLevelCommand {
@@ -59,7 +60,7 @@ impl TopLevelCommand {
             Self::Execute(option_method) => option_method.process(unsigned_transaction).await,
             // Self::Login(mode) => mode.process().await,
             Self::Transfer(currency) => currency.process(unsigned_transaction).await,
-            // Self::Utils(util_type) => util_type.process().await,
+            Self::Utils(util_type) => util_type.process().await,
             // Self::View(view_query_request) => view_query_request.process().await,
         }
     }
