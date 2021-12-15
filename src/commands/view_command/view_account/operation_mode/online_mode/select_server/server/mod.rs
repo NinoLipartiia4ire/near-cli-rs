@@ -4,7 +4,7 @@ use dialoguer::Input;
 #[interactive_clap(context = super::SelectServerContext)]
 pub struct Server {
     #[interactive_clap(named_arg)]
-    ///Specify a contract
+    ///Specify an account
     pub account: super::super::super::super::sender::Sender,
 }
 
@@ -15,7 +15,7 @@ pub struct CustomServer {
     #[interactive_clap(long)]
     pub url: crate::common::AvailableRpcServerUrl,
     #[interactive_clap(named_arg)]
-    ///Specify a contract
+    ///Specify an account
     pub account: super::super::super::super::sender::Sender,
 }
 
