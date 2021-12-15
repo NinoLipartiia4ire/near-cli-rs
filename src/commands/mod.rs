@@ -8,7 +8,7 @@ pub mod generate_shell_completions_command;
 pub mod login;
 pub mod transfer_command;
 pub mod utils_command;
-// pub mod view_command;
+pub mod view_command;
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
@@ -18,10 +18,11 @@ pub enum TopLevelCommand {
     #[strum_discriminants(strum(message = "Login with wallet authorization"))]
     ///Use these to login with wallet authorization
     Login(self::login::operation_mode::OperationMode),
-    // #[strum_discriminants(strum(
-    //     message = "View account, contract code, contract state, transaction, nonce, recent block hash"
-    // ))]
-    // View(self::view_command::ViewQueryRequest),
+    #[strum_discriminants(strum(
+        message = "View account, contract code, contract state, transaction, nonce, recent block hash"
+    ))]
+    ///View account, contract code, contract state, transaction, nonce, recent block hash
+    View(self::view_command::ViewQueryRequest),
     #[strum_discriminants(strum(message = "Transfer tokens"))]
     ///Use these to transfer tokens
     Transfer(self::transfer_command::Currency),
@@ -62,7 +63,7 @@ impl TopLevelCommand {
             Self::Login(mode) => mode.process().await,
             Self::Transfer(currency) => currency.process(unsigned_transaction).await,
             Self::Utils(util_type) => util_type.process().await,
-            // Self::View(view_query_request) => view_query_request.process().await,
+            Self::View(view_query_request) => view_query_request.process().await,
         }
     }
 }
