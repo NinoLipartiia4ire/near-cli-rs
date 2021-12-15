@@ -5,7 +5,7 @@ pub mod construct_transaction_command;
 pub mod delete_command;
 pub mod execute_command;
 pub mod generate_shell_completions_command;
-// pub mod login;
+pub mod login;
 pub mod transfer_command;
 pub mod utils_command;
 // pub mod view_command;
@@ -15,8 +15,9 @@ pub mod utils_command;
 #[interactive_clap(context = ())]
 ///Choose transaction action
 pub enum TopLevelCommand {
-    // #[strum_discriminants(strum(message = "Login with wallet authorization"))]
-    // Login(self::login::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "Login with wallet authorization"))]
+    ///Use these to login with wallet authorization
+    Login(self::login::operation_mode::OperationMode),
     // #[strum_discriminants(strum(
     //     message = "View account, contract code, contract state, transaction, nonce, recent block hash"
     // ))]
@@ -58,7 +59,7 @@ impl TopLevelCommand {
             Self::ConstructTransaction(mode) => mode.process(unsigned_transaction).await,
             Self::Delete(delete_action) => delete_action.process(unsigned_transaction).await,
             Self::Execute(option_method) => option_method.process(unsigned_transaction).await,
-            // Self::Login(mode) => mode.process().await,
+            Self::Login(mode) => mode.process().await,
             Self::Transfer(currency) => currency.process(unsigned_transaction).await,
             Self::Utils(util_type) => util_type.process().await,
             // Self::View(view_query_request) => view_query_request.process().await,
