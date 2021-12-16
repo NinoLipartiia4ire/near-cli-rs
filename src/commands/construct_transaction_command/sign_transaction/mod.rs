@@ -20,11 +20,11 @@ pub enum SignTransaction {
     /// Provide arguments to sign a keychain transaction
     #[strum_discriminants(strum(message = "Yes, I want to sign the transaction with keychain"))]
     SignWithKeychain(self::sign_with_keychain::SignKeychain),
-    // /// Connect your Ledger device and sign transaction with it
-    // #[strum_discriminants(strum(
-    //     message = "Yes, I want to sign the transaction with Ledger device"
-    // ))]
-    // SignWithLedger(self::sign_with_ledger::SignLedger),
+    /// Connect your Ledger device and sign transaction with it
+    #[strum_discriminants(strum(
+        message = "Yes, I want to sign the transaction with Ledger device"
+    ))]
+    SignWithLedger(self::sign_with_ledger::SignLedger),
     /// Provide arguments to sign a manually transaction
     #[strum_discriminants(strum(
         message = "No, I want to construct the transaction and sign it somewhere else"
@@ -47,11 +47,12 @@ impl SignTransaction {
                 chain
                     .process(prepopulated_unsigned_transaction, network_connection_config)
                     .await
-            } // SignTransaction::SignWithLedger(ledger) => {
-            //     ledger
-            //         .process(prepopulated_unsigned_transaction, network_connection_config)
-            //         .await
-            // }
+            }
+            SignTransaction::SignWithLedger(ledger) => {
+                ledger
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
             SignTransaction::SignManually(args_manually) => {
                 args_manually
                     .process(prepopulated_unsigned_transaction, network_connection_config)
