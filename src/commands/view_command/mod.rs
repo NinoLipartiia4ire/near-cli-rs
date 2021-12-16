@@ -37,9 +37,9 @@ pub enum QueryRequest {
     #[strum_discriminants(strum(message = "View a transaction status"))]
     /// View a transaction status
     Transaction(self::view_transaction_status::operation_mode::OperationMode),
-    // #[strum_discriminants(strum(message = "View a nonce for a public key"))]
-    // /// View a nonce for a public key
-    // Nonce(self::view_nonce::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "View a nonce for a public key"))]
+    /// View a nonce for a public key
+    Nonce(self::view_nonce::operation_mode::OperationMode),
     // #[strum_discriminants(strum(message = "View recent block hash for this network"))]
     // /// View recent block hash for this network
     // RecentBlockHash(self::view_recent_block_hash::operation_mode::OperationMode),
@@ -52,7 +52,7 @@ impl QueryRequest {
             QueryRequest::ContractCode(operation_mode) => operation_mode.process().await,
             QueryRequest::ContractState(operation_mode) => operation_mode.process().await,
             QueryRequest::Transaction(operation_mode) => operation_mode.process().await,
-            // QueryRequest::Nonce(operation_mode) => operation_mode.process().await,
+            QueryRequest::Nonce(operation_mode) => operation_mode.process().await,
             // QueryRequest::RecentBlockHash(operation_mode) => operation_mode.process().await,
         }
     }
