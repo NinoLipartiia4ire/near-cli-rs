@@ -21,3 +21,9 @@ impl From<PublicKey> for near_crypto::PublicKey {
         item.0
     }
 }
+
+impl From<near_crypto::PublicKey> for PublicKey {
+    fn from(item: near_crypto::PublicKey) -> Self {
+        Self(item)
+    }
+}

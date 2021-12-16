@@ -8,7 +8,7 @@ pub struct Sender {
     pub sender_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(named_arg)]
     ///Specify a receiver
-    pub send_to: super::receiver::Receiver,
+    pub receiver: super::receiver::Receiver,
 }
 
 impl crate::common::SenderContext {
@@ -52,16 +52,16 @@ impl Sender {
         let new_context_scope = Alias { sender_account_id };
         let new_context =
             crate::common::SenderContext::from_previous_context(context, &new_context_scope);
-        let send_to = super::receiver::Receiver::from(
-            optional_clap_variant.and_then(|clap_variant| match clap_variant.send_to {
-                Some(ClapNamedArgReceiverForSender::SendTo(cli_receiver)) => Some(cli_receiver),
+        let receiver = super::receiver::Receiver::from(
+            optional_clap_variant.and_then(|clap_variant| match clap_variant.receiver {
+                Some(ClapNamedArgReceiverForSender::Receiver(cli_receiver)) => Some(cli_receiver),
                 None => None,
             }),
             new_context,
         )?;
         Ok(Self {
             sender_account_id: new_context_scope.sender_account_id,
-            send_to,
+            receiver,
         })
     }
 }
@@ -100,7 +100,7 @@ impl Sender {
             signer_id: self.sender_account_id.clone().into(),
             ..prepopulated_unsigned_transaction
         };
-        self.send_to
+        self.receiver
             .process(unsigned_transaction, network_connection_config)
             .await
     }
