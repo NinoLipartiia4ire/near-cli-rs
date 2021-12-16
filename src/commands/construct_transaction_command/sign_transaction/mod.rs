@@ -12,11 +12,11 @@ pub mod sign_with_private_key;
 #[interactive_clap(context = crate::common::SenderContext)]
 ///Would you like to sign the transaction?
 pub enum SignTransaction {
-    // /// Provide arguments to sign a private key transaction
-    // #[strum_discriminants(strum(
-    //     message = "Yes, I want to sign the transaction with my private key"
-    // ))]
-    // SignPrivateKey(self::sign_with_private_key::SignPrivateKey),
+    /// Provide arguments to sign a private key transaction
+    #[strum_discriminants(strum(
+        message = "Yes, I want to sign the transaction with my private key"
+    ))]
+    SignPrivateKey(self::sign_with_private_key::SignPrivateKey),
     /// Provide arguments to sign a keychain transaction
     #[strum_discriminants(strum(message = "Yes, I want to sign the transaction with keychain"))]
     SignWithKeychain(self::sign_with_keychain::SignKeychain),
@@ -39,10 +39,10 @@ impl SignTransaction {
         network_connection_config: Option<crate::common::ConnectionConfig>,
     ) -> color_eyre::eyre::Result<Option<near_primitives::views::FinalExecutionOutcomeView>> {
         match self {
-            // SignTransaction::SignPrivateKey(keys) => {
-            //     keys.process(prepopulated_unsigned_transaction, network_connection_config)
-            //         .await
-            // }
+            SignTransaction::SignPrivateKey(keys) => {
+                keys.process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
             SignTransaction::SignWithKeychain(chain) => {
                 chain
                     .process(prepopulated_unsigned_transaction, network_connection_config)

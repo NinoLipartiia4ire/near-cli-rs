@@ -1,5 +1,4 @@
 use interactive_clap::ToCli;
-use interactive_clap_derive::InteractiveClap;
 use near_primitives::borsh::BorshSerialize;
 
 /// подписание сформированной транзакции с помощью личных ключей
@@ -76,18 +75,32 @@ impl From<SignPrivateKey> for CliSignPrivateKey {
 
 impl SignPrivateKey {
     pub fn from(
-        item: CliSignPrivateKey,
-        connection_config: Option<crate::common::ConnectionConfig>,
+        optional_clap_variant: Option<CliSignPrivateKey>,
+        context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let signer_public_key: crate::types::public_key::PublicKey = match item.signer_public_key {
+        let connection_config = context.connection_config.clone();
+        let signer_public_key: crate::types::public_key::PublicKey = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.signer_public_key)
+        {
             Some(cli_public_key) => cli_public_key,
             None => super::input_signer_public_key()?,
         };
-        let signer_private_key: near_crypto::SecretKey = match item.signer_private_key {
+        let signer_private_key: near_crypto::SecretKey = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.signer_private_key)
+        {
             Some(signer_private_key) => signer_private_key,
             None => super::input_signer_private_key()?,
         };
-        let submit: Option<super::Submit> = item.submit;
+        let submit: Option<super::Submit> = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.submit)
+        {
+            Some(submit) => Some(submit),
+            None => None,
+        };
+
         match connection_config {
             Some(_) => Ok(Self {
                 signer_public_key,
@@ -97,11 +110,17 @@ impl SignPrivateKey {
                 submit,
             }),
             None => {
-                let nonce: u64 = match item.nonce {
+                let nonce: u64 = match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.nonce)
+                {
                     Some(cli_nonce) => cli_nonce,
                     None => super::input_access_key_nonce(&signer_public_key.to_string())?,
                 };
-                let block_hash = match item.block_hash {
+                let block_hash = match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.block_hash)
+                {
                     Some(cli_block_hash) => cli_block_hash,
                     None => super::input_block_hash()?,
                 };
@@ -122,14 +141,14 @@ impl SignPrivateKey {
                     let signer_secret_key: near_crypto::SecretKey =
                         super::input_signer_private_key()?;
                     Self::from(
-                        CliSignPrivateKey {
+                        Some(CliSignPrivateKey {
                             signer_public_key: Some(signer_public_key),
                             signer_private_key: Some(signer_secret_key),
                             nonce: Some(nonce),
                             block_hash: Some(block_hash),
                             submit: None,
-                        },
-                        connection_config,
+                        }),
+                        context,
                     )
                 }
             }
