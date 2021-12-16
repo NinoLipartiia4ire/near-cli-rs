@@ -1,6 +1,7 @@
 use near_primitives::borsh::BorshSerialize;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
+#[interactive_clap(context = crate::common::SenderContext)]
 #[interactive_clap(fn_from_cli = default)]
 pub struct SignManually {
     #[interactive_clap(long)]
@@ -21,10 +22,14 @@ impl interactive_clap::ToCli for crate::types::crypto_hash::CryptoHash {
 
 impl SignManually {
     pub fn from(
-        item: CliSignManually,
-        connection_config: Option<crate::common::ConnectionConfig>,
+        optional_clap_variant: Option<CliSignManually>,
+        context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
-        let signer_public_key: crate::types::public_key::PublicKey = match item.signer_public_key {
+        let connection_config = context.connection_config.clone();
+        let signer_public_key: crate::types::public_key::PublicKey = match optional_clap_variant
+            .clone()
+            .and_then(|clap_variant| clap_variant.signer_public_key)
+        {
             Some(cli_public_key) => cli_public_key,
             None => super::input_signer_public_key()?,
         };
@@ -35,11 +40,17 @@ impl SignManually {
                 block_hash: None,
             }),
             None => {
-                let nonce: u64 = match item.nonce {
+                let nonce: u64 = match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.nonce)
+                {
                     Some(cli_nonce) => cli_nonce,
                     None => super::input_access_key_nonce(&signer_public_key.to_string())?,
                 };
-                let block_hash = match item.block_hash {
+                let block_hash = match optional_clap_variant
+                    .clone()
+                    .and_then(|clap_variant| clap_variant.block_hash)
+                {
                     Some(cli_block_hash) => cli_block_hash,
                     None => super::input_block_hash()?,
                 };

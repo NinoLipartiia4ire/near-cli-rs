@@ -25,11 +25,11 @@ pub enum SignTransaction {
     //     message = "Yes, I want to sign the transaction with Ledger device"
     // ))]
     // SignWithLedger(self::sign_with_ledger::SignLedger),
-    // /// Provide arguments to sign a manually transaction
-    // #[strum_discriminants(strum(
-    //     message = "No, I want to construct the transaction and sign it somewhere else"
-    // ))]
-    // SignManually(self::sign_manually::SignManually),
+    /// Provide arguments to sign a manually transaction
+    #[strum_discriminants(strum(
+        message = "No, I want to construct the transaction and sign it somewhere else"
+    ))]
+    SignManually(self::sign_manually::SignManually),
 }
 
 impl SignTransaction {
@@ -48,15 +48,15 @@ impl SignTransaction {
                     .process(prepopulated_unsigned_transaction, network_connection_config)
                     .await
             } // SignTransaction::SignWithLedger(ledger) => {
-              //     ledger
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
-              // SignTransaction::SignManually(args_manually) => {
-              //     args_manually
-              //         .process(prepopulated_unsigned_transaction, network_connection_config)
-              //         .await
-              // }
+            //     ledger
+            //         .process(prepopulated_unsigned_transaction, network_connection_config)
+            //         .await
+            // }
+            SignTransaction::SignManually(args_manually) => {
+                args_manually
+                    .process(prepopulated_unsigned_transaction, network_connection_config)
+                    .await
+            }
         }
     }
 }
@@ -68,7 +68,7 @@ fn input_signer_public_key() -> color_eyre::eyre::Result<crate::types::public_ke
         .unwrap())
 }
 
-fn input_signer_private_key() -> color_eyre::eyre::Result<near_crypto::SecretKey> {
+fn input_signer_private_key() -> color_eyre::eyre::Result<crate::types::secret_key::SecretKey> {
     Ok(Input::new()
         .with_prompt("Enter sender's private key")
         .interact_text()

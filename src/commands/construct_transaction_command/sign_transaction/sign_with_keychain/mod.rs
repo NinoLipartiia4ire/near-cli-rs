@@ -185,7 +185,7 @@ impl SignKeychain {
             .map_err(|err| color_eyre::Report::msg(format!("Error reading data: {}", err)))?;
         let sign_with_private_key = super::sign_with_private_key::SignPrivateKey {
             signer_public_key: crate::types::public_key::PublicKey(account_json.public_key),
-            signer_private_key: account_json.private_key,
+            signer_private_key: crate::types::secret_key::SecretKey(account_json.private_key),
             nonce: self.nonce.clone(),
             block_hash: self.block_hash.clone(),
             submit: self.submit.clone(),
