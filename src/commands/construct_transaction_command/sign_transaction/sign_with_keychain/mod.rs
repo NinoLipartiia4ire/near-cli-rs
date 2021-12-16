@@ -76,7 +76,7 @@ impl SignKeychain {
 
 #[derive(Debug, Deserialize)]
 struct User {
-    account_id: near_primitives::types::AccountId,
+    _account_id: near_primitives::types::AccountId,
     public_key: near_crypto::PublicKey,
     private_key: near_crypto::SecretKey,
 }
