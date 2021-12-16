@@ -31,9 +31,9 @@ pub enum QueryRequest {
     #[strum_discriminants(strum(message = "View a contract code"))]
     /// View a contract code
     ContractCode(self::view_contract_code::operation_mode::OperationMode),
-    // #[strum_discriminants(strum(message = "View a contract state"))]
-    // /// View a contract state
-    // ContractState(self::view_contract_state::operation_mode::OperationMode),
+    #[strum_discriminants(strum(message = "View a contract state"))]
+    /// View a contract state
+    ContractState(self::view_contract_state::operation_mode::OperationMode),
     // #[strum_discriminants(strum(message = "View a transaction status"))]
     // /// View a transaction status
     // Transaction(self::view_transaction_status::operation_mode::OperationMode),
@@ -50,7 +50,7 @@ impl QueryRequest {
         match self {
             QueryRequest::AccountSummary(operation_mode) => operation_mode.process().await,
             QueryRequest::ContractCode(operation_mode) => operation_mode.process().await,
-            // QueryRequest::ContractState(operation_mode) => operation_mode.process().await,
+            QueryRequest::ContractState(operation_mode) => operation_mode.process().await,
             // QueryRequest::Transaction(operation_mode) => operation_mode.process().await,
             // QueryRequest::Nonce(operation_mode) => operation_mode.process().await,
             // QueryRequest::RecentBlockHash(operation_mode) => operation_mode.process().await,
