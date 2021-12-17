@@ -24,7 +24,7 @@ impl crate::common::SenderContext {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::TransferCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -52,7 +52,7 @@ impl Sender {
         let new_context_scope = Alias { sender_account_id };
         let new_context =
             crate::common::SenderContext::from_previous_context(context, &new_context_scope);
-        let receiver = super::receiver::Receiver::from(
+        let receiver = super::receiver::Receiver::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.receiver {
                 Some(ClapNamedArgReceiverForSender::Receiver(cli_receiver)) => Some(cli_receiver),
                 None => None,

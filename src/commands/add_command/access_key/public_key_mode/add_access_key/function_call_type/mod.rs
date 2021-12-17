@@ -22,7 +22,7 @@ impl interactive_clap::ToCli for crate::types::vec_string::VecString {
 }
 
 impl FunctionCallType {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliFunctionCallType>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -67,7 +67,7 @@ impl FunctionCallType {
             None => FunctionCallType::input_method_names(&context)?,
         };
         let sign_option = match optional_clap_variant.and_then(|clap_variant| clap_variant.sign_option) {
-            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), context)?,
+            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from_cli(Some(cli_sign_transaction), context)?,
             None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(context)?,
         };
         Ok(Self {

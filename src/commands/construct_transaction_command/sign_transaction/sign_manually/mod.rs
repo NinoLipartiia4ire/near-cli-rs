@@ -21,7 +21,7 @@ impl interactive_clap::ToCli for crate::types::crypto_hash::CryptoHash {
 }
 
 impl SignManually {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSignManually>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

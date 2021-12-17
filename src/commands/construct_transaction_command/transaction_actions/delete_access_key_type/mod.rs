@@ -50,7 +50,7 @@ impl From<DeleteAccessKeyAction> for CliDeleteAccessKeyAction {
 }
 
 impl DeleteAccessKeyAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliDeleteAccessKeyAction>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

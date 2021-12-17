@@ -10,7 +10,7 @@ pub struct Receiver {
 }
 
 impl Receiver {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliReceiver>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -34,7 +34,7 @@ impl Receiver {
             },
             None => Self::input_receiver_account_id(&context)?,
         };
-        let action = super::transaction_actions::NextAction::from(
+        let action = super::transaction_actions::NextAction::from_cli(
             optional_clap_variant.and_then(|clap_variant| clap_variant.action),
             context,
         )?;

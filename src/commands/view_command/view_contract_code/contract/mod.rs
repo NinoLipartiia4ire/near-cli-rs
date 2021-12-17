@@ -25,7 +25,7 @@ impl crate::common::SenderContext {
 }
 
 impl Contract {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliContract>,
         context: super::operation_mode::online_mode::select_server::ViewContractCodeCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -55,12 +55,13 @@ impl Contract {
                 context,
                 &new_context_scope,
             );
-        let download_mode = match optional_clap_variant
-            .and_then(|clap_variant| clap_variant.download_mode)
-        {
-            Some(cli_arg) => self::download_mode::DownloadMode::from(Some(cli_arg), new_context)?,
-            None => self::download_mode::DownloadMode::choose_variant(new_context)?,
-        };
+        let download_mode =
+            match optional_clap_variant.and_then(|clap_variant| clap_variant.download_mode) {
+                Some(cli_arg) => {
+                    self::download_mode::DownloadMode::from_cli(Some(cli_arg), new_context)?
+                }
+                None => self::download_mode::DownloadMode::choose_variant(new_context)?,
+            };
         Ok(Self {
             contract_account_id: new_context_scope.contract_account_id,
             download_mode,

@@ -56,7 +56,7 @@ impl From<StakeNEARTokensAction> for CliStakeNEARTokensAction {
 }
 
 impl StakeNEARTokensAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliStakeNEARTokensAction>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

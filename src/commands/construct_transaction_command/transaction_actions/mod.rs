@@ -59,7 +59,7 @@ impl NextAction {
     ) -> color_eyre::eyre::Result<Self> {
         match item {
             CliSkipNextAction::Skip(cli_skip_action) => {
-                let skip_action: SkipAction = SkipAction::from(Some(cli_skip_action), context)?;
+                let skip_action: SkipAction = SkipAction::from_cli(Some(cli_skip_action), context)?;
                 Ok(Self::Skip(skip_action))
             }
         }

@@ -24,7 +24,7 @@ impl crate::common::SenderContext {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::ExecuteChangeMethodCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -55,7 +55,7 @@ impl Sender {
             &new_context_scope,
         );
         let sign_option = match optional_clap_variant.and_then(|clap_variant| clap_variant.sign_option) {
-            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), new_context)?,
+            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from_cli(Some(cli_sign_transaction), new_context)?,
             None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(new_context)?,
         };
         Ok(Self {

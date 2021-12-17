@@ -142,7 +142,7 @@ impl From<Util> for CliUtil {
 }
 
 impl Util {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliUtil>,
         context: (),
     ) -> color_eyre::eyre::Result<Self> {
@@ -222,7 +222,7 @@ impl Util {
                 CliUtil::SendSignedTransaction(Default::default())
             }
         };
-        Ok(Self::from(Some(cli_util), context)?)
+        Ok(Self::from_cli(Some(cli_util), context)?)
     }
 
     pub async fn process(self) -> crate::CliResult {

@@ -23,7 +23,7 @@ impl ToCli for crate::types::slip10::BIP32Path {
 }
 
 impl SignLedger {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSignLedger>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

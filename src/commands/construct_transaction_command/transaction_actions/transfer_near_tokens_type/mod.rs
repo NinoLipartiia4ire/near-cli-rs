@@ -50,7 +50,7 @@ impl From<TransferNEARTokensAction> for CliTransferNEARTokensAction {
 }
 
 impl TransferNEARTokensAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliTransferNEARTokensAction>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

@@ -10,7 +10,7 @@ pub struct Sender {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::online_mode::select_server::ViewContractStateCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -31,11 +31,12 @@ impl Sender {
             },
             None => Self::input_sender_account_id(&context)?,
         };
-        let selected_block_id: super::block_id::BlockId =
-            match optional_clap_variant.and_then(|clap_variant| clap_variant.selected_block_id) {
-                Some(cli_block_id) => super::block_id::BlockId::from(Some(cli_block_id), context)?,
-                None => super::block_id::BlockId::choose_variant(context)?,
-            };
+        let selected_block_id: super::block_id::BlockId = match optional_clap_variant
+            .and_then(|clap_variant| clap_variant.selected_block_id)
+        {
+            Some(cli_block_id) => super::block_id::BlockId::from_cli(Some(cli_block_id), context)?,
+            None => super::block_id::BlockId::choose_variant(context)?,
+        };
         Ok(Self {
             sender_account_id,
             selected_block_id,

@@ -11,7 +11,7 @@ pub struct TransferNEARTokensAction {
 }
 
 impl TransferNEARTokensAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<
             <TransferNEARTokensAction as interactive_clap::ToCli>::CliVariant,
         >,
@@ -55,7 +55,7 @@ impl TransferNEARTokensAction {
                 None => TransferNEARTokensAction::input_amount(None)?,
             },
         };
-        let transactions_signing_public_key = super::transactions_signing::TransactionsSigningAction::from(
+        let transactions_signing_public_key = super::transactions_signing::TransactionsSigningAction::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.transactions_signing_public_key {
                 Some(ClapNamedArgTransactionsSigningActionForTransferNEARTokensAction::TransactionsSigningPublicKey(cli_transactions_signing_public_key)) => Some(cli_transactions_signing_public_key),
                 None => None,

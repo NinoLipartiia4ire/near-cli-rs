@@ -11,7 +11,7 @@ pub struct TransferNEARTokensAction {
 }
 
 impl TransferNEARTokensAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<
             <TransferNEARTokensAction as interactive_clap::ToCli>::CliVariant,
         >,
@@ -56,7 +56,7 @@ impl TransferNEARTokensAction {
             },
         };
         let sign_option = match optional_clap_variant.and_then(|clap_variant| clap_variant.sign_option) {
-            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from(Some(cli_sign_transaction), context)?,
+            Some(cli_sign_transaction) => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::from_cli(Some(cli_sign_transaction), context)?,
             None => crate::commands::construct_transaction_command::sign_transaction::SignTransaction::choose_variant(context)?,
         };
         Ok(Self {

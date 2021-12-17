@@ -14,7 +14,7 @@ impl interactive_clap::ToCli for crate::types::account_id::AccountId {
 }
 
 impl Receiver {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliReceiver>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -38,7 +38,7 @@ impl Receiver {
             },
             None => Self::input_receiver_account_id(&context)?,
         };
-        let transfer = super::transfer_near_tokens_type::Transfer::from(
+        let transfer = super::transfer_near_tokens_type::Transfer::from_cli(
             optional_clap_variant.and_then(|clap_variant| clap_variant.transfer),
             context,
         )?;

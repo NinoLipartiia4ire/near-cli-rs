@@ -41,7 +41,7 @@ impl From<CreateAccountAction> for CliCreateAccountAction {
 }
 
 impl CreateAccountAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliCreateAccountAction>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

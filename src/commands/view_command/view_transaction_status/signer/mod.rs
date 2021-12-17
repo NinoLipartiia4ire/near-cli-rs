@@ -8,7 +8,7 @@ pub struct Sender {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::online_mode::select_server::ViewTransactionCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {

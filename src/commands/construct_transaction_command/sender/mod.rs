@@ -24,7 +24,7 @@ impl crate::common::SenderContext {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::ConstructTransactionNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -55,7 +55,7 @@ impl Sender {
                 context,
                 &new_context_scope,
             );
-        let send_to = super::receiver::Receiver::from(
+        let send_to = super::receiver::Receiver::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.receiver {
                 Some(ClapNamedArgReceiverForSender::Receiver(cli_contract)) => Some(cli_contract),
                 None => None,

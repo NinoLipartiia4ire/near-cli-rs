@@ -74,7 +74,7 @@ impl From<CallFunctionAction> for CliCallFunctionAction {
 }
 
 impl CallFunctionAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliCallFunctionAction>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

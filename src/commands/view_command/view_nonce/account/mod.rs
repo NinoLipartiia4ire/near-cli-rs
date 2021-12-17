@@ -10,7 +10,7 @@ pub struct Account {
 }
 
 impl Account {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliAccount>,
         context: super::operation_mode::online_mode::select_server::ViewNonceCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -31,7 +31,7 @@ impl Account {
             },
             None => Self::input_account_id(&context)?,
         };
-        let public_key = super::public_key::AccessKeyType::from(
+        let public_key = super::public_key::AccessKeyType::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.public_key {
                 Some(ClapNamedArgAccessKeyTypeForAccount::PublicKey(cli_args)) => Some(cli_args),
                 None => None,

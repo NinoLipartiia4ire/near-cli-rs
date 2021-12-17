@@ -11,7 +11,7 @@ pub struct Contract {
 }
 
 impl Contract {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliContract>,
         context: super::operation_mode::ExecuteChangeMethodCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -35,7 +35,7 @@ impl Contract {
             },
             None => Self::input_contract_account_id(&context)?,
         };
-        let call = super::call_function_type::CallFunctionAction::from(
+        let call = super::call_function_type::CallFunctionAction::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.call {
                 Some(ClapNamedArgCallFunctionActionForContract::Call(cli_args)) => Some(cli_args),
                 None => None,

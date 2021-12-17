@@ -22,7 +22,7 @@ impl ToCli for crate::types::secret_key::SecretKey {
 }
 
 impl SignPrivateKey {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSignPrivateKey>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -88,7 +88,7 @@ impl SignPrivateKey {
                         super::input_signer_public_key()?;
                     let signer_secret_key: crate::types::secret_key::SecretKey =
                         super::input_signer_private_key()?;
-                    Self::from(
+                    Self::from_cli(
                         Some(CliSignPrivateKey {
                             signer_public_key: Some(signer_public_key),
                             signer_private_key: Some(signer_secret_key),

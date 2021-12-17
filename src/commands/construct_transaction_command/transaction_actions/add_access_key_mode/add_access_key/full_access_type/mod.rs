@@ -41,7 +41,7 @@ impl From<FullAccessType> for CliFullAccessType {
 }
 
 impl FullAccessType {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliFullAccessType>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

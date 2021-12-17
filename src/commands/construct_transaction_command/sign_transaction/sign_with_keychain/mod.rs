@@ -18,7 +18,7 @@ impl interactive_clap::ToCli for super::Submit {
 }
 
 impl SignKeychain {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSignKeychain>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -76,7 +76,7 @@ impl SignKeychain {
 
 #[derive(Debug, Deserialize)]
 struct User {
-    _account_id: near_primitives::types::AccountId,
+    account_id: near_primitives::types::AccountId,
     public_key: near_crypto::PublicKey,
     private_key: near_crypto::SecretKey,
 }

@@ -52,7 +52,7 @@ impl From<DeleteAccountAction> for CliDeleteAccountAction {
 }
 
 impl DeleteAccountAction {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliDeleteAccountAction>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

@@ -23,7 +23,7 @@ impl crate::common::SenderContext {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::AddAccessKeyCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -53,7 +53,7 @@ impl Sender {
             context,
             &new_context_scope,
         );
-        let public_key_mode = super::public_key_mode::PublicKeyMode::from(
+        let public_key_mode = super::public_key_mode::PublicKeyMode::from_cli(
             optional_clap_variant.and_then(|clap_variant| clap_variant.public_key_mode),
             new_context,
         )?;

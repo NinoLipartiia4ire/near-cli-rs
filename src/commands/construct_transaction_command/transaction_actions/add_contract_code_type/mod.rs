@@ -50,7 +50,7 @@ impl From<ContractFile> for CliContractFile {
 }
 
 impl ContractFile {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliContractFile>,
         context: crate::common::SenderContext,
     ) -> color_eyre::eyre::Result<Self> {

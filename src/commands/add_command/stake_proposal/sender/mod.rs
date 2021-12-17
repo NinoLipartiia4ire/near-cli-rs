@@ -24,7 +24,7 @@ impl crate::common::SenderContext {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::AddStakeProposalCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -55,7 +55,7 @@ impl Sender {
                 context,
                 &new_context_scope,
             );
-        let amount = super::transfer_near_tokens_type::TransferNEARTokensAction::from(
+        let amount = super::transfer_near_tokens_type::TransferNEARTokensAction::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.amount {
                 Some(ClapNamedArgTransferNEARTokensActionForSender::Amount(
                     cli_transfer_near_action,

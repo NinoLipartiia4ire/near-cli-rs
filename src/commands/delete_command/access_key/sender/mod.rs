@@ -24,7 +24,7 @@ impl crate::common::SenderContext {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::DeleteAccessKeyCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -54,7 +54,7 @@ impl Sender {
             context,
             &new_context_scope,
         );
-        let public_key = super::DeleteAccessKeyType::from(
+        let public_key = super::DeleteAccessKeyType::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.public_key {
                 Some(ClapNamedArgDeleteAccessKeyTypeForSender::PublicKey(cli_arg)) => Some(cli_arg),
                 None => None,

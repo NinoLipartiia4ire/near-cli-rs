@@ -24,7 +24,7 @@ impl crate::common::SenderContext {
 }
 
 impl Sender {
-    pub fn from(
+    pub fn from_cli(
         optional_clap_variant: Option<CliSender>,
         context: super::operation_mode::DeleteAccountCommandNetworkContext,
     ) -> color_eyre::eyre::Result<Self> {
@@ -54,7 +54,7 @@ impl Sender {
             context,
             &new_context_scope,
         );
-        let beneficiary = super::DeleteAccountAction::from(
+        let beneficiary = super::DeleteAccountAction::from_cli(
             optional_clap_variant.and_then(|clap_variant| match clap_variant.beneficiary {
                 Some(ClapNamedArgDeleteAccountActionForSender::Beneficiary(cli_arg)) => {
                     Some(cli_arg)

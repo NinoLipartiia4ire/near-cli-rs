@@ -32,7 +32,7 @@ fn main() -> CliResult {
     //     return Ok(());
     // }
 
-    let args = Args::from(Some(cli), ())?;
+    let args = Args::from_cli(Some(cli), ())?;
 
     let completed_cli = CliArgs::from(args.clone());
 
