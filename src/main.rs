@@ -1,4 +1,4 @@
-use clap::Clap;
+pub use clap::{Clap, Error};
 use shell_words;
 
 use common::{try_external_subcommand_execution, CliResult};
@@ -24,7 +24,7 @@ impl Args {
 fn main() -> CliResult {
     color_eyre::install()?;
 
-    let cli = match CliArgs::try_parse() {
+    let cli = match Args::try_parse() {
         Ok(cli) => cli,
         Err(error) => {
             if matches!(
