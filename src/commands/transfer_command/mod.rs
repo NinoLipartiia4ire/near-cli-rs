@@ -6,7 +6,6 @@ mod sender;
 pub mod transfer_near_tokens_type;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 pub struct Currency {
     #[interactive_clap(subcommand)]
     currency_selection: CurrencySelection,
@@ -25,7 +24,6 @@ impl Currency {
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = ())]
 ///What do you want to transfer?
 pub enum CurrencySelection {
     /// The transfer is carried out in NEAR tokens

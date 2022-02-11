@@ -4,7 +4,6 @@ mod offline_mode;
 mod online_mode;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 pub struct OperationMode {
     #[interactive_clap(subcommand)]
     pub mode: Mode,
@@ -21,7 +20,6 @@ impl OperationMode {
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = ())]
 ///To construct a transaction you will need to provide information about sender (signer) and receiver accounts, and actions that needs to be performed.
 ///Do you want to derive some information required for transaction construction automatically querying it online?
 pub enum Mode {

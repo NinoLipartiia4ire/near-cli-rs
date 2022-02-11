@@ -12,7 +12,6 @@ mod sign_transaction_with_ledger_subcommand;
 mod view_serialized_transaction;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 pub struct Utils {
     #[interactive_clap(subcommand)]
     pub util: Util,

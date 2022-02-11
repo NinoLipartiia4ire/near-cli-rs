@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
+#[interactive_clap(input_context = ())]
 #[interactive_clap(output_context = OfflineArgsContext)]
 pub struct OfflineArgs {
     #[interactive_clap(named_arg)]

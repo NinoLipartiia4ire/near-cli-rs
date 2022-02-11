@@ -4,7 +4,6 @@ mod access_key;
 mod account;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 pub struct DeleteAction {
     #[interactive_clap(subcommand)]
     pub action: Action,
@@ -21,7 +20,6 @@ impl DeleteAction {
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = ())]
 ///Сhoose what you want to delete
 pub enum Action {
     #[strum_discriminants(strum(message = "Delete an access key for this account"))]

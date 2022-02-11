@@ -12,7 +12,6 @@ pub mod view_command;
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = ())]
 ///Choose transaction action
 pub enum TopLevelCommand {
     #[strum_discriminants(strum(message = "Login with wallet authorization"))]

@@ -9,7 +9,6 @@ mod consts;
 mod types;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 struct Args {
     #[interactive_clap(subcommand)]
     top_level_command: self::commands::TopLevelCommand,

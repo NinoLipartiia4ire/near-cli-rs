@@ -4,7 +4,6 @@ mod change_method;
 mod view_method;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 pub struct OptionMethod {
     #[interactive_clap(subcommand)]
     method: Method,
@@ -21,7 +20,6 @@ impl OptionMethod {
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = ())]
 ///Choose your method
 pub enum Method {
     #[strum_discriminants(strum(

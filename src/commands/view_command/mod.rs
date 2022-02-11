@@ -8,7 +8,6 @@ mod view_recent_block_hash;
 mod view_transaction_status;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 pub struct ViewQueryRequest {
     #[interactive_clap(subcommand)]
     pub query: QueryRequest,
@@ -22,7 +21,6 @@ impl ViewQueryRequest {
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = ())]
 ///Сhoose what you want to view
 pub enum QueryRequest {
     #[strum_discriminants(strum(message = "View properties for an account"))]

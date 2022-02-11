@@ -7,7 +7,6 @@ mod stake_proposal;
 mod sub_account;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
-#[interactive_clap(context = ())]
 pub struct AddAction {
     #[interactive_clap(subcommand)]
     pub action: Action,
@@ -24,7 +23,6 @@ impl AddAction {
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = ())]
 /// What do you want to add?
 pub enum Action {
     #[strum_discriminants(strum(message = "Add a new access key for an account"))]
