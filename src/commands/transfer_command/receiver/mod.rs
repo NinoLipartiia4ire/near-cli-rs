@@ -4,6 +4,7 @@ use dialoguer::Input;
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct Receiver {
     #[interactive_clap(skip_default_from_cli)]
+    #[interactive_clap(skip_default_input_arg)]
     pub receiver_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(subcommand)]
     pub transfer: super::transfer_near_tokens_type::Transfer,

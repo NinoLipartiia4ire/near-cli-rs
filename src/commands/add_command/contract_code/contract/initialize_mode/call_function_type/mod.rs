@@ -3,11 +3,15 @@ use dialoguer::Input;
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct CallFunctionAction {
+    ///Enter a method name
     method_name: String,
+    ///Enter args for function
     args: String,
     #[interactive_clap(long = "prepaid-gas")]
+    #[interactive_clap(skip_default_input_arg)]
     gas: crate::common::NearGas,
     #[interactive_clap(long = "attached-deposit")]
+    ///Enter a deposit for function (example: 10NEAR or 0.5near or 10000yoctonear)
     deposit: crate::common::NearBalance,
     #[interactive_clap(subcommand)]
     pub sign_option:
@@ -15,15 +19,6 @@ pub struct CallFunctionAction {
 }
 
 impl CallFunctionAction {
-    fn input_method_name(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<String> {
-        println!();
-        Ok(Input::new()
-            .with_prompt("Enter a method name")
-            .interact_text()?)
-    }
-
     fn input_gas(
         _context: &crate::common::SignerContext,
     ) -> color_eyre::eyre::Result<crate::common::NearGas> {
@@ -45,25 +40,18 @@ impl CallFunctionAction {
         Ok(gas.into())
     }
 
-    fn input_args(_context: &crate::common::SignerContext) -> color_eyre::eyre::Result<String> {
-        println!();
-        Ok(Input::new()
-            .with_prompt("Enter args for function")
-            .interact_text()?)
-    }
-
-    fn input_deposit(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
-        println!();
-        let deposit: crate::common::NearBalance = Input::new()
-            .with_prompt(
-                "Enter a deposit for function (example: 10NEAR or 0.5near or 10000yoctonear).",
-            )
-            .with_initial_text("0 NEAR")
-            .interact_text()?;
-        Ok(deposit)
-    }
+    // fn input_deposit(
+    //     _context: &crate::common::SignerContext,
+    // ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
+    //     println!();
+    //     let deposit: crate::common::NearBalance = Input::new()
+    //         .with_prompt(
+    //             "Enter a deposit for function (example: 10NEAR or 0.5near or 10000yoctonear).",
+    //         )
+    //         .with_initial_text("0 NEAR")
+    //         .interact_text()?;
+    //     Ok(deposit)
+    // }
 
     pub async fn process(
         self,

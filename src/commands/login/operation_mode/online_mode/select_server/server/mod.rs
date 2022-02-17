@@ -11,6 +11,7 @@ pub struct Server {}
 #[interactive_clap(output_context = super::LoginCommandNetworkContext)]
 pub struct CustomServer {
     #[interactive_clap(long)]
+    ///What is the RPC endpoint?
     pub url: crate::common::AvailableRpcServerUrl,
 }
 
@@ -38,14 +39,6 @@ impl From<CustomServerContext> for super::LoginCommandNetworkContext {
 }
 
 impl CustomServer {
-    pub fn input_url(
-        _context: &super::SelectServerContext,
-    ) -> color_eyre::eyre::Result<crate::common::AvailableRpcServerUrl> {
-        Ok(Input::new()
-            .with_prompt("What is the RPC endpoint?")
-            .interact_text()?)
-    }
-
     pub async fn process(self) -> crate::CliResult {
         let connection_config = crate::common::ConnectionConfig::from_custom_url(&self.url);
         login(connection_config).await

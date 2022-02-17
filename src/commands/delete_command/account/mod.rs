@@ -7,6 +7,7 @@ mod sender;
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct DeleteAccountAction {
     #[interactive_clap(skip_default_from_cli)]
+    #[interactive_clap(skip_default_input_arg)]
     pub beneficiary_id: crate::types::account_id::AccountId,
     #[interactive_clap(subcommand)]
     pub sign_option:

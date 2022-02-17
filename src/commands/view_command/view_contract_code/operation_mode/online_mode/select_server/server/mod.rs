@@ -1,5 +1,3 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = super::SelectServerContext)]
 pub struct Server {
@@ -13,6 +11,7 @@ pub struct Server {
 #[interactive_clap(output_context = super::ViewContractCodeCommandNetworkContext)]
 pub struct CustomServer {
     #[interactive_clap(long)]
+    ///What is the RPC endpoint?
     pub url: crate::common::AvailableRpcServerUrl,
     #[interactive_clap(named_arg)]
     ///Specify a contract
@@ -52,14 +51,6 @@ impl Server {
 }
 
 impl CustomServer {
-    pub fn input_url(
-        _context: &super::SelectServerContext,
-    ) -> color_eyre::eyre::Result<crate::common::AvailableRpcServerUrl> {
-        Ok(Input::new()
-            .with_prompt("What is the RPC endpoint?")
-            .interact_text()?)
-    }
-
     pub async fn process(self) -> crate::CliResult {
         let connection_config = crate::common::ConnectionConfig::from_custom_url(&self.url);
         self.contract.process(connection_config).await
