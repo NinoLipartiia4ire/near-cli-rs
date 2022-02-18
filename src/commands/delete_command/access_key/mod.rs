@@ -1,11 +1,10 @@
-use dialoguer::Input;
-
 pub mod operation_mode;
 mod sender;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct DeleteAccessKeyType {
+    ///Enter a public key for this access key
     pub public_key: crate::types::public_key::PublicKey,
     #[interactive_clap(subcommand)]
     pub sign_option:
@@ -13,14 +12,6 @@ pub struct DeleteAccessKeyType {
 }
 
 impl DeleteAccessKeyType {
-    fn input_public_key(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::types::public_key::PublicKey> {
-        Ok(Input::new()
-            .with_prompt("Enter a public key for this access key")
-            .interact_text()?)
-    }
-
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

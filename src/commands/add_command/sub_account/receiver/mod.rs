@@ -1,8 +1,7 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct SubAccount {
+    ///What is the sub-account ID?
     pub sub_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(named_arg)]
     ///Specify a full access key for the sub-account
@@ -10,14 +9,6 @@ pub struct SubAccount {
 }
 
 impl SubAccount {
-    fn input_sub_account_id(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::types::account_id::AccountId> {
-        Ok(Input::new()
-            .with_prompt("What is the sub-account ID?")
-            .interact_text()?)
-    }
-
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

@@ -1,20 +1,11 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = super::super::operation_mode::online_mode::select_server::ViewContractStateCommandNetworkContext)]
 pub struct BlockIdHeight {
+    ///Type the block ID height for this account
     block_id_height: near_primitives::types::BlockHeight,
 }
 
 impl BlockIdHeight {
-    pub fn input_block_id_height(
-        _context: &super::super::operation_mode::online_mode::select_server::ViewContractStateCommandNetworkContext,
-    ) -> color_eyre::eyre::Result<near_primitives::types::BlockHeight> {
-        Ok(Input::new()
-            .with_prompt("Type the block ID height for this account")
-            .interact_text()?)
-    }
-
     pub async fn process(
         self,
         sender_account_id: near_primitives::types::AccountId,

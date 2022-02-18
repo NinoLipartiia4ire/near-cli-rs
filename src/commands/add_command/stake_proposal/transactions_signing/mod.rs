@@ -1,8 +1,7 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct TransactionsSigningAction {
+    ///Enter a public key for this server
     pub public_key: crate::types::public_key::PublicKey,
     #[interactive_clap(subcommand)]
     pub sign_option:
@@ -10,14 +9,6 @@ pub struct TransactionsSigningAction {
 }
 
 impl TransactionsSigningAction {
-    fn input_public_key(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::types::public_key::PublicKey> {
-        Ok(Input::new()
-            .with_prompt("Enter a public key for this server")
-            .interact_text()?)
-    }
-
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

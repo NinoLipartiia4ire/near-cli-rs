@@ -1,5 +1,3 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = super::SelectServerContext)]
 pub struct Server {
@@ -12,6 +10,7 @@ pub struct Server {
 #[interactive_clap(input_context = super::SelectServerContext)]
 #[interactive_clap(output_context = super::super::super::AddAccessKeyCommandNetworkContext)]
 pub struct CustomServer {
+    ///What is the RPC endpoint?
     pub url: crate::common::AvailableRpcServerUrl,
     #[interactive_clap(named_arg)]
     ///Specify the account to be deleted
@@ -38,16 +37,6 @@ impl From<CustomServerContext> for super::super::super::DeleteAccessKeyCommandNe
         Self {
             connection_config: Some(crate::common::ConnectionConfig::from_custom_url(&item.url)),
         }
-    }
-}
-
-impl CustomServer {
-    pub fn input_url(
-        _context: &super::SelectServerContext,
-    ) -> color_eyre::eyre::Result<crate::common::AvailableRpcServerUrl> {
-        Ok(Input::new()
-            .with_prompt("What is the RPC endpoint?")
-            .interact_text()?)
     }
 }
 

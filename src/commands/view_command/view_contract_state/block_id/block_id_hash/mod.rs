@@ -1,20 +1,11 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = super::super::operation_mode::online_mode::select_server::ViewContractStateCommandNetworkContext)]
 pub struct BlockIdHash {
+    ///Type the block ID hash for this account
     block_id_hash: crate::types::crypto_hash::CryptoHash,
 }
 
 impl BlockIdHash {
-    pub fn input_block_id_hash(
-        _context: &super::super::operation_mode::online_mode::select_server::ViewContractStateCommandNetworkContext,
-    ) -> color_eyre::eyre::Result<crate::types::crypto_hash::CryptoHash> {
-        Ok(Input::new()
-            .with_prompt("Type the block ID hash for this account")
-            .interact_text()?)
-    }
-
     pub async fn process(
         self,
         sender_account_id: near_primitives::types::AccountId,

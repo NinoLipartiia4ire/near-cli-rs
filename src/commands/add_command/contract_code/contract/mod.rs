@@ -1,26 +1,15 @@
-use dialoguer::Input;
-
 mod initialize_mode;
 
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct ContractFile {
+    ///What is a file location of the contract?
     pub file_path: crate::types::path_buf::PathBuf,
     #[interactive_clap(subcommand)]
     next_action: self::initialize_mode::NextAction,
 }
 
 impl ContractFile {
-    fn input_file_path(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::types::path_buf::PathBuf> {
-        println!();
-        let input_file_path: String = Input::new()
-            .with_prompt("What is a file location of the contract?")
-            .interact_text()?;
-        Ok(std::path::PathBuf::from(input_file_path).into())
-    }
-
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

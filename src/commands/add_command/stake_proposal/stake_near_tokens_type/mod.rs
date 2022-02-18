@@ -1,8 +1,7 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct StakeNEARTokensAction {
+    ///How many NEAR Tokens do you want to stake? (example: 10NEAR or 0.5near or 10000yoctonear)
     pub stake_amount: crate::common::NearBalance,
     #[interactive_clap(named_arg)]
     ///Enter an public key
@@ -10,15 +9,6 @@ pub struct StakeNEARTokensAction {
 }
 
 impl StakeNEARTokensAction {
-    fn input_stake_amount(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
-        Ok(Input::new()
-            .with_prompt("How many NEAR Tokens do you want to stake? (example: 10NEAR or 0.5near or 10000yoctonear)")
-            .interact_text()
-            ?)
-    }
-
     pub async fn process(
         self,
         prepopulated_unsigned_transaction: near_primitives::transaction::Transaction,

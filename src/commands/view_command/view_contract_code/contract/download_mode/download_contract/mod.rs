@@ -1,26 +1,13 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct ContractFile {
+    ///Where to download the contract file?
     pub file_path: crate::types::path_buf::PathBuf,
     #[interactive_clap(subcommand)]
     pub selected_block_id: super::super::super::block_id::BlockId,
 }
 
 impl ContractFile {
-    fn input_file_path(
-        context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::types::path_buf::PathBuf> {
-        println!();
-        let contract_account_id = context.signer_account_id.clone();
-        let input_file_path: String = Input::new()
-            .with_prompt("Where to download the contract file?")
-            .with_initial_text(format!("{}.wasm", contract_account_id))
-            .interact_text()?;
-        Ok(std::path::PathBuf::from(input_file_path).into())
-    }
-
     pub async fn process(
         self,
         contract_id: near_primitives::types::AccountId,

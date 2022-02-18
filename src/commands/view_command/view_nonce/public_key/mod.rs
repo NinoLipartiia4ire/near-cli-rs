@@ -1,20 +1,11 @@
-use dialoguer::Input;
-
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = super::operation_mode::online_mode::select_server::ViewNonceCommandNetworkContext)]
 pub struct AccessKeyType {
+    ///Enter a public key for this access key
     pub public_key: crate::types::public_key::PublicKey,
 }
 
 impl AccessKeyType {
-    fn input_public_key(
-        _context: &super::operation_mode::online_mode::select_server::ViewNonceCommandNetworkContext,
-    ) -> color_eyre::eyre::Result<crate::types::public_key::PublicKey> {
-        Ok(Input::new()
-            .with_prompt("Enter a public key for this access key")
-            .interact_text()?)
-    }
-
     pub async fn process(
         self,
         account_id: near_primitives::types::AccountId,

@@ -1473,7 +1473,7 @@ dependencies = [
 [[package]]
 name = "interactive_clap"
 version = "0.1.0"
-source = "git+https://github.com/FroVolod/interactive-clap?rev=ab874b06be58b74aa4bd4819336daccab8fa6803#ab874b06be58b74aa4bd4819336daccab8fa6803"
+source = "git+https://github.com/FroVolod/interactive-clap?rev=527511cc78dfe2bea6c66b00497bcbc41451596c#527511cc78dfe2bea6c66b00497bcbc41451596c"
 dependencies = [
  "interactive_clap_derive",
  "near-ledger",
@@ -1482,7 +1482,7 @@ dependencies = [
 [[package]]
 name = "interactive_clap_derive"
 version = "0.1.0"
-source = "git+https://github.com/FroVolod/interactive-clap?rev=ab874b06be58b74aa4bd4819336daccab8fa6803#ab874b06be58b74aa4bd4819336daccab8fa6803"
+source = "git+https://github.com/FroVolod/interactive-clap?rev=527511cc78dfe2bea6c66b00497bcbc41451596c#527511cc78dfe2bea6c66b00497bcbc41451596c"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",

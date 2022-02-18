@@ -11,7 +11,7 @@ pub struct CallFunctionAction {
     #[interactive_clap(skip_default_input_arg)]
     gas: crate::common::NearGas,
     #[interactive_clap(long = "attached-deposit")]
-    ///Enter a deposit for function (example: 10NEAR or 0.5near or 10000yoctonear)
+    #[interactive_clap(skip_default_input_arg)]
     deposit: crate::common::NearBalance,
     #[interactive_clap(named_arg)]
     /// Specify a signer
@@ -38,6 +38,19 @@ impl CallFunctionAction {
             }
         };
         Ok(gas.into())
+    }
+
+    fn input_deposit(
+        _context: &super::operation_mode::ExecuteChangeMethodCommandNetworkContext,
+    ) -> color_eyre::eyre::Result<crate::common::NearBalance> {
+        println!();
+        let deposit: crate::common::NearBalance = Input::new()
+            .with_prompt(
+                "Enter a deposit for function (example: 10NEAR or 0.5near or 10000yoctonear).",
+            )
+            .with_initial_text("0 NEAR")
+            .interact_text()?;
+        Ok(deposit)
     }
 
     pub async fn process(

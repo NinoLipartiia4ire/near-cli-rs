@@ -1,5 +1,4 @@
 use async_recursion::async_recursion;
-use dialoguer::Input;
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
 
 mod full_access_type;
@@ -8,20 +7,13 @@ mod function_call_type;
 #[derive(Debug, Clone, interactive_clap_derive::InteractiveClap)]
 #[interactive_clap(context = crate::common::SignerContext)]
 pub struct AddAccessKeyAction {
+    ///Enter a public key for this access key
     pub public_key: crate::types::public_key::PublicKey,
     #[interactive_clap(subcommand)]
     pub permission: AccessKeyPermission,
 }
 
 impl AddAccessKeyAction {
-    fn input_public_key(
-        _context: &crate::common::SignerContext,
-    ) -> color_eyre::eyre::Result<crate::types::public_key::PublicKey> {
-        Ok(Input::new()
-            .with_prompt("Enter a public key for this access key")
-            .interact_text()?)
-    }
-
     #[async_recursion(?Send)]
     pub async fn process(
         self,
