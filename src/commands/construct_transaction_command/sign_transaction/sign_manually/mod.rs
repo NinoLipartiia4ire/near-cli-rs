@@ -5,10 +5,16 @@ use near_primitives::borsh::BorshSerialize;
 #[interactive_clap(skip_default_from_cli)]
 pub struct SignManually {
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     pub signer_public_key: crate::types::public_key::PublicKey,
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     nonce: Option<u64>,
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     block_hash: Option<crate::types::crypto_hash::CryptoHash>,
 }
 

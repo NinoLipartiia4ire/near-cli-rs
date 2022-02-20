@@ -4,6 +4,8 @@ use dialoguer::Input;
 #[interactive_clap(context = super::operation_mode::online_mode::select_server::ExecuteViewMethodCommandNetworkContext)]
 #[interactive_clap(skip_default_from_cli)]
 pub struct Contract {
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     pub contract_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(named_arg)]
     ///Call function

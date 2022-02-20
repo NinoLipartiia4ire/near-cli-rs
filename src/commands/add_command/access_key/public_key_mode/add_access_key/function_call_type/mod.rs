@@ -7,10 +7,16 @@ use dialoguer::{console::Term, theme::ColorfulTheme, Input, Select};
 #[interactive_clap(skip_default_from_cli)]
 pub struct FunctionCallType {
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     pub allowance: Option<crate::common::NearBalance>,
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     pub receiver_account_id: crate::types::account_id::AccountId,
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     pub method_names: crate::types::vec_string::VecString,
     #[interactive_clap(subcommand)]
     pub sign_option:

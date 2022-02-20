@@ -7,8 +7,12 @@ use serde::Deserialize;
 #[interactive_clap(skip_default_from_cli)]
 pub struct SignKeychain {
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     nonce: Option<u64>,
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     block_hash: Option<crate::types::crypto_hash::CryptoHash>,
     #[interactive_clap(subcommand)]
     pub submit: Option<super::Submit>,

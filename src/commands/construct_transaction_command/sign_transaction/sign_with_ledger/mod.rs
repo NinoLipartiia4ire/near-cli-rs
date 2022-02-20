@@ -6,12 +6,18 @@ use near_primitives::borsh::BorshSerialize;
 #[interactive_clap(skip_default_from_cli)]
 pub struct SignLedger {
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     pub seed_phrase_hd_path: crate::types::slip10::BIP32Path,
     #[interactive_clap(skip)]
     pub signer_public_key: crate::types::public_key::PublicKey,
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     nonce: Option<u64>,
     #[interactive_clap(long)]
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     block_hash: Option<crate::types::crypto_hash::CryptoHash>,
     #[interactive_clap(subcommand)]
     pub submit: Option<super::Submit>,
@@ -28,7 +34,7 @@ impl SignLedger {
             .and_then(|clap_variant| clap_variant.seed_phrase_hd_path)
         {
             Some(hd_path) => hd_path,
-            None => SignLedger::input_seed_phrase_hd_path(),
+            None => SignLedger::input_seed_phrase_hd_path(&context)?,
         };
         println!(
             "Please allow getting the PublicKey on Ledger device (HD Path: {})",
@@ -92,12 +98,14 @@ impl SignLedger {
 }
 
 impl SignLedger {
-    pub fn input_seed_phrase_hd_path() -> crate::types::slip10::BIP32Path {
-        Input::new()
+    pub fn input_seed_phrase_hd_path(
+        _context: &crate::common::SignerContext,
+    ) -> color_eyre::eyre::Result<crate::types::slip10::BIP32Path> {
+        Ok(Input::new()
             .with_prompt("Enter seed phrase HD Path (if you not sure leave blank for default)")
             .with_initial_text("44'/397'/0'/0'/1'")
             .interact_text()
-            .unwrap()
+            .unwrap())
     }
 
     pub async fn process(

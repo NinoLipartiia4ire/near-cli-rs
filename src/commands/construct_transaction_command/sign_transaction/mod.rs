@@ -66,19 +66,19 @@ impl SignTransaction {
     }
 }
 
-fn input_signer_public_key() -> color_eyre::eyre::Result<crate::types::public_key::PublicKey> {
+pub fn input_signer_public_key() -> color_eyre::eyre::Result<crate::types::public_key::PublicKey> {
     Ok(Input::new()
         .with_prompt("Enter sender (signer) public key")
         .interact_text()?)
 }
 
-fn input_signer_private_key() -> color_eyre::eyre::Result<crate::types::secret_key::SecretKey> {
+pub fn input_signer_private_key() -> color_eyre::eyre::Result<crate::types::secret_key::SecretKey> {
     Ok(Input::new()
         .with_prompt("Enter sender (signer) private (secret) key")
         .interact_text()?)
 }
 
-fn input_access_key_nonce(public_key: &str) -> color_eyre::eyre::Result<u64> {
+pub fn input_access_key_nonce(public_key: &str) -> color_eyre::eyre::Result<u64> {
     println!("Your public key: `{}`", public_key);
     Ok(Input::new()
         .with_prompt(
@@ -91,7 +91,7 @@ fn input_access_key_nonce(public_key: &str) -> color_eyre::eyre::Result<u64> {
         .interact_text()?)
 }
 
-fn input_block_hash() -> color_eyre::eyre::Result<crate::types::crypto_hash::CryptoHash> {
+pub fn input_block_hash() -> color_eyre::eyre::Result<crate::types::crypto_hash::CryptoHash> {
     let input_block_hash: crate::common::BlockHashAsBase58 = Input::new()
         .with_prompt(
             "Enter recent block hash (query information about the hash of the last block with \

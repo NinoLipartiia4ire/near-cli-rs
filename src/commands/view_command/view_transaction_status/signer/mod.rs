@@ -4,6 +4,8 @@ use dialoguer::Input;
 #[interactive_clap(context = super::operation_mode::online_mode::select_server::ViewTransactionCommandNetworkContext)]
 #[interactive_clap(skip_default_from_cli)]
 pub struct Sender {
+    #[interactive_clap(skip_default_from_cli_arg)]
+    #[interactive_clap(skip_default_input_arg)]
     pub sender_account_id: crate::types::account_id::AccountId,
 }
 
