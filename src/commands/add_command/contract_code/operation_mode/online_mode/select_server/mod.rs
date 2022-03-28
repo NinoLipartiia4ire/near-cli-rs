@@ -7,7 +7,7 @@ pub mod server;
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
-#[interactive_clap(context = crate::common::SignerContext)]
+#[interactive_clap(context = SelectServerContext)]
 #[interactive_clap(input_context = ())]
 #[interactive_clap(output_context = SelectServerContext)]
 #[interactive_clap(skip_default_from_cli)]
