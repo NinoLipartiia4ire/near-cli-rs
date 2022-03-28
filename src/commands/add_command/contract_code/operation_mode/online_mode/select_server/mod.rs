@@ -1,11 +1,16 @@
 use strum::{EnumDiscriminants, EnumIter, EnumMessage};
+use std::env;
+
+//use crate::commands::login::operation_mode::online_mode::select_server::SelectServerContext;
 
 pub mod server;
 
 #[derive(Debug, Clone, EnumDiscriminants, interactive_clap_derive::InteractiveClap)]
 #[strum_discriminants(derive(EnumMessage, EnumIter))]
+#[interactive_clap(context = crate::common::SignerContext)]
 #[interactive_clap(input_context = ())]
 #[interactive_clap(output_context = SelectServerContext)]
+#[interactive_clap(skip_default_from_cli)]
 ///Select NEAR protocol RPC server
 pub enum SelectServer {
     /// Provide data for the server https://rpc.testnet.near.org
@@ -20,6 +25,42 @@ pub enum SelectServer {
     /// Provide data for a manually specified server
     #[strum_discriminants(strum(message = "Custom"))]
     Custom(self::server::CustomServer),
+}
+
+impl SelectServer {
+    pub fn from_cli(
+        optional_clap_variant: Option<
+            <SelectServer as interactive_clap::ToCli>::CliVariant,
+        >,
+        context: SelectServerContext,
+    ) -> color_eyre::eyre::Result<Self> {
+        let selected_network: SelectServer = match env::var("NETWORK") {
+            Ok(network) => {
+                panic!("Found a network");
+                /*match &network.to_lowercase() {
+                    String::from("testnet") => panic!("testnet")/*SelectServer::Testnet(crate::consts::TESTNET_API_SERVER_URL)*/,
+                    String::from("mainnet") => panic!("mainnet")/*SelectServer::Mainnet(crate::consts::MAINNET_API_SERVER_URL)*/,
+                    String::from("betanet") => panic!("betanet")/*SelectServer::Betanet(crate::consts::BETANET_API_SERVER_URL)*/,
+                    _ => {
+                        panic!("custom");
+                        /*let separator_index = network.find(':');
+                        assert!(separator_index < network.len(), "Enter the URL");
+                        let url = network[separator_index + 1:]
+                        if network.contains("custom") {
+                            SelectServer::Custom(url),
+                        } else {
+                            panic!("Incorrect network name")
+                        }*/
+                    }, 
+                }*/
+
+            },
+            Err(_) => {
+                panic!("PANIC FOR NOW");
+            },
+        };
+        Ok(selected_network)
+    }
 }
 
 #[derive(Clone)]
